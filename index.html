@@ -10,11 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>4 em 1 · PMRv</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-  
     <link rel="stylesheet" href="css/inlined.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -403,44 +399,45 @@
             </select>
             <input type="text" id="pmrv_sentido_manual" class="hidden mt-8" placeholder="Descreva o sentido..." data-input="pmrv_atualizar()">
           </div>
-         <div class="form-field">
-  <label class="field-label">Tipo de Sinistro</label>
-  <select id="pmrv_subtipo" data-change="pmrv_mudarSubtipo()">
-    <optgroup label="1. Atropelamento">
-      <option value="1.1">1.1 – Atropelamento de Pedestre</option>
-      <option value="1.2">1.2 – Atropelamento de Animal</option>
-    </optgroup>
-    <optgroup label="2. Abalroamento">
-      <option value="2.1">2.1 – Abalroamento Longitudinal (Mesmo Sentido)</option>
-      <option value="2.2">2.2 – Abalroamento Longitudinal (Sentido Oposto)</option>
-      <option value="2.3">2.3 – Abalroamento Transversal</option>
-    </optgroup>
-    <optgroup label="3. Colisão">
-      <option value="3.1">3.1 – Colisão Frontal</option>
-      <option value="3.2">3.2 – Colisão Traseira</option>
-      <option value="3.3">3.3 – Colisão Engavetamento</option>
-    </optgroup>
-    <optgroup label="4. Choque">
-      <option value="4.1">4.1 – Choque em Poste</option>
-      <option value="4.6">4.6 – Choque em Defensa</option>
-      <option value="4.9">4.9 – Choque em Objeto (especificar)</option>
-    </optgroup>
-    <optgroup label="5. Saída de Pista">
-      <option value="5.1">5.1 – Saída de Pista Simples</option>
-      <option value="5.3">5.3 – Saída de Pista com Capotamento</option>
-      <option value="5.4">5.4 – Saída de Pista com Tombamento</option>
-    </optgroup>
-    <optgroup label="6. Saída + Choque">
-      <option value="6.1">6.1 – Saída + Choque em Poste</option>
-      <option value="6.2">6.2 – Saída + Choque em Muro</option>
-      <option value="6.3">6.3 – Saída + Choque em Defensa</option>
-      <option value="6.4">6.4 – Saída + Choque em Objeto (especificar)</option>
-    </optgroup>
-    <optgroup label="7. Outros">
-      <option value="7.1">7.1 – Outros (especificar)</option>
-    </optgroup>
-  </select>
-</div>
+          <div class="form-field">
+            <label class="field-label">Tipo de Sinistro</label>
+            <select id="pmrv_subtipo" data-change="pmrv_mudarSubtipo()">
+              <optgroup label="1. Atropelamento">
+                <option value="1.1">1.1 – Atropelamento de Pedestre</option>
+                <option value="1.2">1.2 – Atropelamento de Animal</option>
+              </optgroup>
+              <optgroup label="2. Abalroamento">
+                <option value="2.1">2.1 – Abalroamento Longitudinal (Mesmo Sentido)</option>
+                <option value="2.2">2.2 – Abalroamento Longitudinal (Sentido Oposto)</option>
+                <option value="2.3">2.3 – Abalroamento Transversal</option>
+              </optgroup>
+              <optgroup label="3. Colisão">
+                <option value="3.1">3.1 – Colisão Frontal</option>
+                <option value="3.2">3.2 – Colisão Traseira</option>
+                <option value="3.3">3.3 – Colisão Engavetamento</option>
+              </optgroup>
+              <optgroup label="4. Choque">
+                <option value="4.1">4.1 – Choque em Poste</option>
+                <option value="4.6">4.6 – Choque em Defensa</option>
+                <option value="4.9">4.9 – Choque em Objeto (especificar)</option>
+              </optgroup>
+              <optgroup label="5. Saída de Pista">
+                <option value="5.1">5.1 – Saída de Pista Simples</option>
+                <option value="5.3">5.3 – Saída de Pista com Capotamento</option>
+                <option value="5.4">5.4 – Saída de Pista com Tombamento</option>
+              </optgroup>
+              <optgroup label="6. Saída + Choque">
+                <option value="6.1">6.1 – Saída + Choque em Poste</option>
+                <option value="6.2">6.2 – Saída + Choque em Muro</option>
+                <option value="6.3">6.3 – Saída + Choque em Defensa</option>
+                <option value="6.4">6.4 – Saída + Choque em Objeto (especificar)</option>
+              </optgroup>
+              <optgroup label="7. Outros">
+                <option value="7.1">7.1 – Outros (especificar)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
 
         <!-- Objeto / Outros condicional -->
         <div id="pmrv_box_objeto" class="form-field hidden">
@@ -549,13 +546,9 @@
 
         <!-- SVG area -->
         <div id="dan-diagram-area" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:220px;"></div>
+        <div id="dan-part-readout" style="margin-top:8px;padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:rgba(245,130,32,.06);font-size:13px;color:var(--text);font-weight:700;min-height:42px;display:flex;align-items:center;">Passe ou toque em um círculo para ver o nome da peça.</div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px;">
           <p style="font-size:11px;color:var(--label);margin:0;" id="dan-hint-txt">Toque num círculo → escolha o tipo de dano</p>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn btn-sm" id="dan-edit-btn" type="button" data-click="danToggleEditar()">✏️ Editar círculos</button>
-            <button class="btn btn-sm btn-success" type="button" data-click="danSalvarCoordenadas(this)">💾 Salvar layout</button>
-            <button class="btn btn-sm" type="button" data-click="danExportarCoordenadas()">📤 Exportar</button>
-          </div>
         </div>
       </div>
 
@@ -645,12 +638,13 @@
               <div class="v360-legend-scroll" id="v360-legend-list"></div>
           </div>
         </div>
+        <div id="v360-part-readout" style="margin-top:8px;padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:rgba(245,130,32,.06);font-size:13px;color:var(--text);font-weight:700;min-height:42px;display:flex;align-items:center;">Toque em um círculo para ver o nome da peça selecionada.</div>
       </div>
 
       <div class="card" style="margin-top:12px;">
         <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--label);margin-bottom:10px;">Danos registrados</div>
         <div id="v360-summary-tags">
-          <div style="font-size:13px;color:var(--label);text-align:center;padding:18px;border:1px dashed var(--border);border-radius:10px;">Nenhum dano registrado ainda.<br>Adicione marcadores na foto.</div>
+          <div style="font-size:13px;color:var(--label);text-align:center;padding:18px;border:1px dashed var(--border);border-radius:10px;">Nenhum dano registrado ainda.<br>Toque nos pontos da foto.</div>
         </div>
         <div style="height:1px;background:var(--border);margin:14px 0;"></div>
         <button class="btn btn-success btn-full" style="margin-bottom:8px;" data-click="danSalvarVeiculo()">💾 Salvar este veículo</button>
@@ -878,20 +872,6 @@
 </div>
 
 <!-- Modal Galeria de Fotos -->
-<!-- Modal exportar coordenadas JS -->
-<div id="dan-export-modal" data-click="danFecharExportModalOnBackdrop(event)"
-     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:#1a1f2e;border:1px solid var(--border);border-radius:16px;padding:20px;max-width:600px;width:100%;max-height:80vh;display:flex;flex-direction:column;gap:12px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-weight:800;font-size:16px;color:#F58220;">📄 Exportar Coordenadas JS</span>
-      <button class="btn btn-sm btn-danger" data-click="danFecharExportModal()">✕</button>
-    </div>
-    <p style="font-size:12px;color:var(--label);margin:0;">Copie o código abaixo e substitua o trecho correspondente dentro do <code>DAN_DIAGRAMAS</code> ou <code>v360makeDb()</code> no HTML.</p>
-    <textarea id="dan-export-code" style="flex:1;min-height:260px;background:#0d1117;color:#a5f3fc;font-size:11px;font-family:monospace;border:1px solid var(--border);border-radius:8px;padding:10px;resize:vertical;" readonly></textarea>
-    <button class="btn btn-success" data-click="danExportCopiar(this)">📋 Copiar código</button>
-  </div>
-</div>
-
 <div id="foto-galeria-overlay" data-click="env_fecharGaleriaOnBackdrop(event)">
   <div class="foto-galeria-header">
     <span class="foto-galeria-titulo"></span>

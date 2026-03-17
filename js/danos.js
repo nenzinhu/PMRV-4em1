@@ -133,9 +133,6 @@ let danVeiculoAtivo = 0;
 let danVista        = 'frontal';
 let danPontoAberto  = null;
 let danVeiculosSalvos = [];
-let danModoEditar   = false;   // toggle edição de pontos
-let danDragState    = null;    // {id, startX, startY, origPx, origPy}
-let danPontoCustomCount = 0;   // contador para IDs únicos de pontos customizados
 let danTooltipHideTimer = null;
 
 function danAdicionarVeiculo(tipo) {
@@ -209,7 +206,7 @@ function danRenderDiagramaMulti(idx) {
       <g style="cursor:pointer;transform-origin:${cx}px ${cy}px" data-click="danAbrirModalMulti(${idx},'${p.id}')">
         <title>${p.label}</title>
         <circle cx="${cx}" cy="${cy}" r="${rRing}" fill="none" stroke="${cor}" stroke-width="1.5" stroke-dasharray="4 2" opacity="${dano?'1':'0.5'}"/>
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dano ? cor : 'rgba(10,20,60,0.82)'}" stroke="${cor}" stroke-width="2" data-part-label="${p.label}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dano ? cor : 'rgba(10,20,60,0.82)'}" stroke="${cor}" stroke-width="2" data-part-label="${p.label}" data-zoom-src="${zoomSrc}" data-zoom-x="${p.px}" data-zoom-y="${p.py}" data-zoom-scale="${v.tipo === 'carro' ? 420 : 300}"/>
         <text x="${cx}" y="${cy + fSize*0.38}" text-anchor="middle" dominant-baseline="middle"
               fill="${dano?'#000':'#fff'}" font-size="${fSize}" font-weight="900"
               font-family="Barlow Condensed,sans-serif" style="pointer-events:none">${i+1}</text>
@@ -238,7 +235,7 @@ function danRenderDiagramaMulti(idx) {
     ${bgEl}
     ${hs}
   </svg>`;
-  danBindHotspotTooltips(area);
+  danBindHotspotTooltips(area, 'dan-part-readout');
 }
 
 /* ---------------------------------------------------------------
@@ -509,26 +506,6 @@ function danMudarVista(v) {
   danRenderDiagrama();
 }
 
-function danToggleEditar() {
-  danModoEditar = !danModoEditar;
-  const btn  = document.getElementById('dan-edit-btn');
-  const hint = document.getElementById('dan-hint-txt');
-  if (danModoEditar) {
-    btn.style.background = 'rgba(245,130,32,.25)';
-    btn.style.borderColor = '#F58220';
-    btn.style.color = '#F58220';
-    hint.textContent = 'Modo editar: toque para adicionar ponto • arraste para mover • toque no × para remover';
-    hint.style.color = '#F58220';
-  } else {
-    btn.style.background = '';
-    btn.style.borderColor = '';
-    btn.style.color = '';
-    hint.textContent = 'Toque num círculo → escolha o tipo de dano';
-    hint.style.color = '';
-  }
-  danRenderDiagrama();
-}
-
 function danAtualizarTabs() {
   ['frontal','traseira','esquerda','direita'].forEach(v => {
     document.getElementById('dan-tab-' + v).classList.toggle('active', v === danVista);
@@ -590,6 +567,8 @@ function danRenderDiagrama() {
 
   // Build hotspot circles as SVG elements (% coordinates → svg units)
   let hs = '';
+  const ALL_IMGS = Object.assign({}, CARRO_IMGS, MOTO_IMGS);
+  const zoomSrc = cfg.img && ALL_IMGS[cfg.img] ? ALL_IMGS[cfg.img] : '';
   cfg.pontos.forEach((p, i) => {
     const ref = mobileOverrides && mobileOverrides[p.id] && !p.saved ? { ...p, ...mobileOverrides[p.id] } : p;
     const dano = danDanos[p.id];
@@ -598,44 +577,21 @@ function danRenderDiagrama() {
     const cx   = coords.x;
     const cy   = coords.y;
 
-    if (danModoEditar) {
-      const isCustom = p.custom === true;
-      // No modo editar: drag para mover, botão × para remover
-      hs += `
-      <g id="danG_${p.id}" class="dan-hotspot-edit" style="cursor:grab;transform-origin:${cx}px ${cy}px"
-         data-pointerdown="danDragStart(event,'${p.id}')">
-        <circle cx="${cx}" cy="${cy}" r="${rRing}" fill="none" stroke="#F58220" stroke-width="1.5" stroke-dasharray="4 2"/>
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(245,130,32,0.25)" stroke="#F58220" stroke-width="2"/>
-        <text x="${cx}" y="${cy + fSize*0.38}" text-anchor="middle" dominant-baseline="middle"
-              fill="#fff" font-size="${fSize}" font-weight="900"
-              font-family="Barlow Condensed,sans-serif" style="pointer-events:none">${i+1}</text>
-        <!-- Botão × remover -->
-        <g data-click="danRemoverPonto('${p.id}')" style="cursor:pointer;">
-          <circle cx="${cx + r*0.75}" cy="${cy - r*0.75}" r="${r*0.5}" fill="#ef4444" stroke="#fff" stroke-width="1"/>
-          <text x="${cx + r*0.75}" y="${cy - r*0.75 + r*0.18}" text-anchor="middle" dominant-baseline="middle"
-                fill="#fff" font-size="${r*0.55}" font-weight="900" style="pointer-events:none">×</text>
-        </g>
-        ${isCustom ? `<text x="${cx}" y="${cy - rRing - 3}" text-anchor="middle"
-              fill="#F58220" font-size="${fSize*0.9}" style="pointer-events:none">✚</text>` : ''}
-      </g>`;
-    } else {
-      hs += `
+    hs += `
       <g style="cursor:pointer;transform-origin:${cx}px ${cy}px" data-click="danAbrirModal('${p.id}')">
         <title>${p.label}</title>
         <circle cx="${cx}" cy="${cy}" r="${rRing}" fill="none" stroke="${cor}" stroke-width="1.5" stroke-dasharray="4 2" opacity="${dano?'1':'0.5'}"/>
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dano ? cor : 'rgba(10,20,60,0.82)'}" stroke="${cor}" stroke-width="2" data-part-label="${p.label}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dano ? cor : 'rgba(10,20,60,0.82)'}" stroke="${cor}" stroke-width="2" data-part-label="${p.label}" data-zoom-src="${zoomSrc}" data-zoom-x="${ref.px}" data-zoom-y="${ref.py}" data-zoom-scale="${danVeiculo === 'carro' ? 420 : 300}"/>
         <text x="${cx}" y="${cy + fSize*0.38}" text-anchor="middle" dominant-baseline="middle"
               fill="${dano?'#000':'#fff'}" font-size="${fSize}" font-weight="900"
               font-family="Barlow Condensed,sans-serif" style="pointer-events:none">${i+1}</text>
         ${dano ? `<text x="${cx}" y="${cy - rRing - 3}" text-anchor="middle"
               fill="${cor}" font-size="${fSize*1.1}" style="pointer-events:none">${DAN_DMG_EMOJI[dano]}</text>` : ''}
       </g>`;
-    }
   });
 
   // If we have a real photo for this view, use it as SVG image background
   let bgEl = '';
-  const ALL_IMGS = Object.assign({}, CARRO_IMGS, MOTO_IMGS);
   if (cfg.img && ALL_IMGS[cfg.img]) {
     const isCarro = CARRO_IMGS[cfg.img] !== undefined;
     if (isCarro) {
@@ -666,159 +622,51 @@ function danRenderDiagrama() {
     bgEl += danMotoSVGFallback(danVista, vbW, vbH);
   }
 
-  // Overlay de edição: clique no fundo para adicionar ponto
-  const editOverlay = danModoEditar
-    ? `<rect x="0" y="0" width="${vbW}" height="${vbH}" fill="transparent" style="cursor:crosshair;"
-         data-click="danAdicionarPontoNoClique(event,this)"/>`
-    : '';
-
   area.innerHTML = `<svg id="dan-svg-main" viewBox="${cfg.vb}" xmlns="http://www.w3.org/2000/svg"
-    class="${danModoEditar ? 'dan-editing-svg' : ''}"
-    style="width:100%;max-width:560px;height:auto;display:block;border-radius:12px;${danModoEditar?'outline:2px dashed #F58220;':''}">
+    style="width:100%;max-width:560px;height:auto;display:block;border-radius:12px;">
     ${bgEl}
-    ${editOverlay}
     ${hs}
   </svg>`;
-  danBindHotspotTooltips(area);
-
-  // Drag events no SVG (pointer move/up no documento)
-  if (danModoEditar) {
-    document.addEventListener('pointermove', danDragMove);
-    document.addEventListener('pointerup',   danDragEnd);
-  } else {
-    document.removeEventListener('pointermove', danDragMove);
-    document.removeEventListener('pointerup',   danDragEnd);
-  }
-}
-
-/* ---------------------------------------------------------------
-   DANOS — EDIÇÃO DE PONTOS (adicionar / mover / remover)
---------------------------------------------------------------- */
-function danSvgCoordenadas(event) {
-  const svg = document.getElementById('dan-svg-main');
-  const pt  = svg.createSVGPoint();
-  pt.x = event.clientX;
-  pt.y = event.clientY;
-  return pt.matrixTransform(svg.getScreenCTM().inverse());
-}
-
-function danAdicionarPontoNoClique(event, overlayEl) {
-  // o clique deve ser no overlay (rect), não nos círculos
-  if (event.target !== overlayEl) return;
-  const metrics = danGetViewMetrics();
-  const cfg = metrics.cfg;
-  const pt  = danSvgCoordenadas(event);
-  const stored = danSvgToStoredCoords(pt.x, pt.y, metrics);
-  danPontoCustomCount++;
-  const id  = 'C' + danVeiculo + danVista.charAt(0).toUpperCase() + danPontoCustomCount;
-  cfg.pontos.push({ id, label: 'Ponto extra ' + danPontoCustomCount, px: stored.px, py: stored.py, custom: true, saved: true });
-  danRenderDiagrama();
-}
-
-function danRemoverPonto(id) {
-  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
-  const idx = cfg.pontos.findIndex(p => p.id === id);
-  if (idx === -1) return;
-  cfg.pontos.splice(idx, 1);
-  delete danDanos[id];
-  danRenderDiagrama();
-  danRenderSummary && danRenderSummary();
-}
-
-function danDragStart(event, id) {
-  if (event.target.closest('[data-click^="danRemoverPonto"]')) return;
-  event.stopPropagation();
-  event.preventDefault();
-  const metrics = danGetViewMetrics();
-  const cfg = metrics.cfg;
-  const p   = cfg.pontos.find(q => q.id === id);
-  if (!p) return;
-  const startSvg = danSvgCoordenadas(event);
-  const origSvg = danStoredToSvgCoords(p.px, p.py, metrics);
-  if (event.declarativeTarget && event.declarativeTarget.setPointerCapture) {
-    try { event.declarativeTarget.setPointerCapture(event.pointerId); } catch (e) {}
-  }
-  danDragState = {
-    id,
-    pointerId: event.pointerId,
-    metrics,
-    groupId: 'danG_' + id,
-    origSvgX: origSvg.x,
-    origSvgY: origSvg.y,
-    startSvgX: startSvg.x,
-    startSvgY: startSvg.y,
-    pendingPx: p.px,
-    pendingPy: p.py
-  };
-}
-
-function danDragMove(event) {
-  if (!danDragState || (danDragState.pointerId !== undefined && event.pointerId !== danDragState.pointerId)) return;
-  event.preventDefault();
-  const pt = danSvgCoordenadas(event);
-  const newSvgX = danDragState.origSvgX + (pt.x - danDragState.startSvgX);
-  const newSvgY = danDragState.origSvgY + (pt.y - danDragState.startSvgY);
-  const stored = danSvgToStoredCoords(newSvgX, newSvgY, danDragState.metrics);
-  const clampedSvg = danStoredToSvgCoords(stored.px, stored.py, danDragState.metrics);
-  danDragState.pendingPx = stored.px;
-  danDragState.pendingPy = stored.py;
-  const group = document.getElementById(danDragState.groupId);
-  if (group) {
-    group.setAttribute(
-      'transform',
-      `translate(${(clampedSvg.x - danDragState.origSvgX).toFixed(2)} ${(clampedSvg.y - danDragState.origSvgY).toFixed(2)})`
-    );
-  }
-}
-
-function danDragEnd(event) {
-  if (!danDragState || (event && danDragState.pointerId !== undefined && event.pointerId !== danDragState.pointerId)) return;
-  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
-  const p = cfg.pontos.find(q => q.id === danDragState.id);
-  if (p) {
-    p.px = danDragState.pendingPx;
-    p.py = danDragState.pendingPy;
-    p.saved = true;
-  }
-  danDragState = null;
-  danRenderDiagrama();
-}
-
-/* ---------------------------------------------------------------
-   DANOS CARRO — SALVAR / EXPORTAR COORDENADAS
---------------------------------------------------------------- */
-const DAN_STORAGE_KEY = 'pmrv_dan_coords_v1';
-
-function danSalvarCoordenadas(btn) {
-  // Salva pontos de todas as vistas do veículo atual no localStorage
-  const saved = JSON.parse(localStorage.getItem(DAN_STORAGE_KEY) || '{}');
-  ['frontal','traseira','esquerda','direita'].forEach(vista => {
-    const key = danVeiculo + '_' + vista;
-    saved[key] = DAN_DIAGRAMAS[danVeiculo][vista].pontos.map(p => ({
-      id: p.id, label: p.label, px: p.px, py: p.py, custom: p.custom || false, saved: true
-    }));
-  });
-  localStorage.setItem(DAN_STORAGE_KEY, JSON.stringify(saved));
-
-  if (btn) {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✅ Salvo!';
-    setTimeout(() => btn.innerHTML = orig, 1800);
-  }
+  danBindHotspotTooltips(area, 'dan-part-readout');
 }
 
 function danGetTooltipEl() {
   return document.getElementById('dan-hover-tooltip');
 }
 
-function danShowTooltip(label, event) {
+function danEscapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function danSetPartReadout(targetId, label, fallback) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.textContent = label || fallback;
+}
+
+function danShowTooltip(label, event, zoomMeta) {
   const el = danGetTooltipEl();
   if (!el || !label) return;
   if (danTooltipHideTimer) {
     clearTimeout(danTooltipHideTimer);
     danTooltipHideTimer = null;
   }
-  el.textContent = label;
+  if (zoomMeta && zoomMeta.src) {
+    const scale = zoomMeta.scale || 240;
+    const scaleRatio = scale / 100;
+    const posX = zoomMeta.x || 50;
+    const posY = zoomMeta.y || 50;
+    const translateX = 50 - (posX * scaleRatio);
+    const translateY = 50 - (posY * scaleRatio);
+    el.innerHTML = `<div class="dan-tooltip-zoom"><img class="dan-tooltip-zoom-img" src="${danEscapeHtml(zoomMeta.src)}" alt="" style="transform:translate(${translateX}%, ${translateY}%) scale(${scaleRatio});" /></div><span class="dan-tooltip-label">${danEscapeHtml(label)}</span>`;
+  } else {
+    el.innerHTML = `<span class="dan-tooltip-label">${danEscapeHtml(label)}</span>`;
+  }
   el.classList.add('open');
   danMoveTooltip(event);
 }
@@ -826,9 +674,25 @@ function danShowTooltip(label, event) {
 function danMoveTooltip(event) {
   const el = danGetTooltipEl();
   if (!el || !el.classList.contains('open')) return;
-  const offset = 14;
+  const offset = 10;
   const maxLeft = window.innerWidth - el.offsetWidth - 12;
   const maxTop = window.innerHeight - el.offsetHeight - 12;
+  const target = event && event.currentTarget && typeof event.currentTarget.getBoundingClientRect === 'function'
+    ? event.currentTarget
+    : null;
+
+  if (target) {
+    const rect = target.getBoundingClientRect();
+    const preferredLeft = rect.left + (rect.width / 2) - (el.offsetWidth / 2);
+    const preferredTop = rect.top - el.offsetHeight - offset;
+    const left = Math.max(12, Math.min(preferredLeft, maxLeft));
+    const top = preferredTop < 12
+      ? Math.max(12, Math.min(rect.bottom + offset, maxTop))
+      : Math.max(12, Math.min(preferredTop, maxTop));
+    el.style.transform = `translate(${left}px, ${top}px)`;
+    return;
+  }
+
   const left = Math.min(event.clientX + offset, maxLeft);
   const top = Math.min(event.clientY + offset, maxTop);
   el.style.transform = `translate(${Math.max(12, left)}px, ${Math.max(12, top)}px)`;
@@ -843,83 +707,81 @@ function danHideTooltip() {
   }, 40);
 }
 
-function danBindHotspotTooltips(container) {
+function danBindHotspotTooltips(container, readoutId) {
   const nodes = container.querySelectorAll('[data-part-label]');
+  const fallback = 'Passe ou toque em um círculo para ver o nome da peça.';
   nodes.forEach(node => {
     const label = node.getAttribute('data-part-label');
-    node.addEventListener('mouseenter', event => danShowTooltip(label, event));
+    const zoomMeta = {
+      src: node.getAttribute('data-zoom-src'),
+      x: parseFloat(node.getAttribute('data-zoom-x') || '50'),
+      y: parseFloat(node.getAttribute('data-zoom-y') || '50'),
+      scale: parseFloat(node.getAttribute('data-zoom-scale') || '240')
+    };
+    node.addEventListener('mouseenter', event => {
+      danSetPartReadout(readoutId, label, fallback);
+      danShowTooltip(label, event, zoomMeta);
+    });
     node.addEventListener('mousemove', danMoveTooltip);
-    node.addEventListener('mouseleave', danHideTooltip);
+    node.addEventListener('mouseleave', () => {
+      danHideTooltip();
+      danSetPartReadout(readoutId, '', fallback);
+    });
+    node.addEventListener('pointerdown', event => {
+      danSetPartReadout(readoutId, label, fallback);
+      danShowTooltip(label, event, zoomMeta);
+    });
+    node.addEventListener('focus', event => {
+      danSetPartReadout(readoutId, label, fallback);
+      danShowTooltip(label, event, zoomMeta);
+    });
   });
 }
 
-function v360BindTooltips(container) {
+function v360BindTooltips(container, readoutId) {
   const nodes = container.querySelectorAll('.v360-pin[data-part-label]');
+  const fallback = 'Toque em um círculo para ver o nome da peça selecionada.';
   nodes.forEach(node => {
     const label = node.getAttribute('data-part-label');
-    node.addEventListener('mouseenter', event => danShowTooltip(label, event));
+    const zoomMeta = {
+      src: node.getAttribute('data-zoom-src'),
+      x: parseFloat(node.getAttribute('data-zoom-x') || '50'),
+      y: parseFloat(node.getAttribute('data-zoom-y') || '50'),
+      scale: parseFloat(node.getAttribute('data-zoom-scale') || '240')
+    };
+    node.addEventListener('mouseenter', event => {
+      danSetPartReadout(readoutId, label, fallback);
+      danShowTooltip(label, event, zoomMeta);
+    });
     node.addEventListener('mousemove', danMoveTooltip);
-    node.addEventListener('mouseleave', danHideTooltip);
+    node.addEventListener('mouseleave', () => {
+      danHideTooltip();
+      danSetPartReadout(readoutId, '', fallback);
+    });
+    node.addEventListener('pointerdown', event => {
+      danSetPartReadout(readoutId, label, fallback);
+      danShowTooltip(label, event, zoomMeta);
+    });
+    node.addEventListener('focus', event => {
+      danSetPartReadout(readoutId, label, fallback);
+      danShowTooltip(label, event, zoomMeta);
+    });
   });
 }
 
 function danCarregarCoordenadasSalvas() {
-  const saved = JSON.parse(localStorage.getItem(DAN_STORAGE_KEY) || '{}');
-  ['carro','moto'].forEach(tipo => {
+  ['carro'].forEach(tipo => {
     ['frontal','traseira','esquerda','direita'].forEach(vista => {
-      const key = tipo + '_' + vista;
-      if (saved[key] && DAN_DIAGRAMAS[tipo] && DAN_DIAGRAMAS[tipo][vista]) {
-        DAN_DIAGRAMAS[tipo][vista].pontos = saved[key].map(p => ({ ...p, saved: true }));
+      if (DAN_DIAGRAMAS[tipo] && DAN_DIAGRAMAS[tipo][vista]) {
+        DAN_DIAGRAMAS[tipo][vista].pontos = DAN_DIAGRAMAS[tipo][vista].pontos.map(p => ({ ...p, saved: true }));
       }
     });
   });
 }
 
-function danExportarCoordenadas() {
-  let code = '// ===== COORDENADAS EXPORTADAS — ' + new Date().toLocaleString('pt-BR') + ' =====\n\n';
-  ['carro','moto'].forEach(tipo => {
-    if (!DAN_DIAGRAMAS[tipo]) return;
-    code += '// --- ' + tipo.toUpperCase() + ' ---\n';
-    ['frontal','traseira','esquerda','direita'].forEach(vista => {
-      if (!DAN_DIAGRAMAS[tipo][vista]) return;
-      const pontos = DAN_DIAGRAMAS[tipo][vista].pontos;
-      code += tipo + '.' + vista + '.pontos = [\n';
-      pontos.forEach(p => {
-        code += '  {id:\'' + p.id + '\', label:\'' + p.label + '\', px:' + p.px + ', py:' + p.py + (p.custom ? ', custom:true' : '') + '},\n';
-      });
-      code += '];\n';
-    });
-    code += '\n';
-  });
-
-  document.getElementById('dan-export-code').value = code;
-  const modal = document.getElementById('dan-export-modal');
-  modal.style.display = 'flex';
-}
-
-function danExportCopiar(btn) {
-  const txt = document.getElementById('dan-export-code').value;
-  navigator.clipboard.writeText(txt).then(() => {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✅ Copiado!';
-    setTimeout(() => btn.innerHTML = orig, 2000);
-  });
-}
-
-function danFecharExportModal() {
-  document.getElementById('dan-export-modal').style.display = 'none';
-}
-
-function danFecharExportModalOnBackdrop(event) {
-  if (event.target === event.declarativeTarget) danFecharExportModal();
-}
-
 /* ---------------------------------------------------------------
-   MOTO — EDITAR / SALVAR / EXPORTAR COORDENADAS (v360)
+   MOTO — POSICIONAMENTO E VISUALIZAÇÃO (v360)
 --------------------------------------------------------------- */
-const V360_STORAGE_KEY = 'pmrv_v360_coords_v2';
-let v360ModoEditar = false;
-let v360DragState  = null;
 
 function v360GetCanvasEl() {
   return document.getElementById('v360-canvas');
@@ -961,135 +823,6 @@ function v360ImageToCanvasPosition(x, y) {
     left: metrics.leftPct + (x / 100) * metrics.widthPct,
     top: metrics.topPct + (y / 100) * metrics.heightPct
   };
-}
-
-function v360PointerToImagePosition(clientX, clientY) {
-  const metrics = v360GetImageMetrics();
-  if (!metrics || !metrics.canvasRect.width || !metrics.canvasRect.height) {
-    return { x: 50, y: 50 };
-  }
-
-  const absLeft = ((clientX - metrics.canvasRect.left) / metrics.canvasRect.width) * 100;
-  const absTop = ((clientY - metrics.canvasRect.top) / metrics.canvasRect.height) * 100;
-
-  const relX = ((absLeft - metrics.leftPct) / metrics.widthPct) * 100;
-  const relY = ((absTop - metrics.topPct) / metrics.heightPct) * 100;
-
-  return {
-    x: parseFloat(Math.max(2, Math.min(98, relX)).toFixed(2)),
-    y: parseFloat(Math.max(2, Math.min(98, relY)).toFixed(2))
-  };
-}
-
-function v360ToggleEditar() {
-  v360ModoEditar = !v360ModoEditar;
-  const btn  = document.getElementById('v360-edit-btn');
-  const hint = document.getElementById('v360-hint-txt');
-  if (v360ModoEditar) {
-    btn.style.background   = 'rgba(245,130,32,.25)';
-    btn.style.borderColor  = '#F58220';
-    btn.style.color        = '#F58220';
-    hint.textContent = 'Modo editar: toque na imagem para adicionar pino · arraste para mover · × para remover';
-    hint.style.color = '#F58220';
-    document.getElementById('v360-canvas').classList.add('editing');
-    // Ativar clique no canvas para adicionar pino
-    document.getElementById('v360-canvas').addEventListener('click', v360CanvasClick);
-    document.addEventListener('pointermove', v360PinDragMove);
-    document.addEventListener('pointerup',   v360PinDragEnd);
-  } else {
-    btn.style.background   = '';
-    btn.style.borderColor  = '';
-    btn.style.color        = '';
-    hint.textContent = 'Toque nos círculos para registrar os danos.';
-    hint.style.color = '';
-    document.getElementById('v360-canvas').classList.remove('editing');
-    document.getElementById('v360-canvas').removeEventListener('click', v360CanvasClick);
-    document.removeEventListener('pointermove', v360PinDragMove);
-    document.removeEventListener('pointerup',   v360PinDragEnd);
-  }
-  v360render();
-}
-
-function v360CanvasClick(e) {
-  if (!v360ModoEditar) return;
-  // Ignorar clique nos próprios pinos
-  if (e.target.classList.contains('v360-pin') || e.target.classList.contains('v360-pin-del')) return;
-  const { x, y } = v360PointerToImagePosition(e.clientX, e.clientY);
-  const newId  = Date.now();
-  const newNum = 'X' + v360db[v360tab].length + 1;
-  v360db[v360tab].push({ id: newId, num: newNum, nome: 'Ponto extra', grupo: 'EXTRA', dano: null, x, y, custom: true });
-  v360render();
-}
-
-function v360PinDragMove(e) {
-  if (!v360DragState) return;
-  const item = v360db[v360tab].find(i => i.id === v360DragState.id);
-  if (!item) return;
-  const { x, y } = v360PointerToImagePosition(e.clientX, e.clientY);
-  item.x = x;
-  item.y = y;
-  // Mover pin visual diretamente sem re-render completo
-  const pin = document.getElementById('v360pin_' + v360DragState.id);
-  if (pin) {
-    const pos = v360ImageToCanvasPosition(item.x, item.y);
-    pin.style.left = pos.left + '%';
-    pin.style.top = pos.top + '%';
-  }
-}
-
-function v360PinDragEnd() {
-  if (v360DragState) { v360DragState = null; v360render(); }
-}
-
-function v360SalvarCoordenadas(btn) {
-  const saved = JSON.parse(localStorage.getItem(V360_STORAGE_KEY) || '{}');
-  ['frente','tras','direita','esquerda'].forEach(tab => {
-    saved[tab] = v360db[tab].map(i => ({
-      id: i.id, num: i.num, nome: i.nome, grupo: i.grupo, x: i.x, y: i.y, custom: i.custom || false
-    }));
-  });
-  localStorage.setItem(V360_STORAGE_KEY, JSON.stringify(saved));
-  if (btn) {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✅ Salvo!';
-    setTimeout(() => btn.innerHTML = orig, 1800);
-  }
-}
-
-function v360CarregarCoordenadasSalvas() {
-  const saved = JSON.parse(localStorage.getItem(V360_STORAGE_KEY) || '{}');
-  if (!Object.keys(saved).length) return;
-  ['frente','tras','direita','esquerda'].forEach(tab => {
-    if (!saved[tab]) return;
-    // Preservar danos existentes, atualizar posições
-    saved[tab].forEach(s => {
-      const existing = v360db[tab].find(i => i.id === s.id);
-      if (existing) { existing.x = s.x; existing.y = s.y; }
-      else if (s.custom) {
-        v360db[tab].push({ id: s.id, num: s.num, nome: s.nome, grupo: s.grupo, dano: null, x: s.x, y: s.y, custom: true });
-      }
-    });
-  });
-}
-
-function v360ExportarCoordenadas() {
-  let code = '// ===== COORDENADAS MOTO (v360makeDb) EXPORTADAS — ' + new Date().toLocaleString('pt-BR') + ' =====\n';
-  code += '// Substitua o return dentro de v360makeDb() por este objeto:\n\n';
-  code += 'return {\n';
-  ['frente','tras','direita','esquerda'].forEach(tab => {
-    code += '  ' + tab + ': [\n';
-    v360db[tab].forEach(i => {
-      code += '    {id:' + i.id + ', num:' + JSON.stringify(i.num) + ', nome:' + JSON.stringify(i.nome) +
-              ', grupo:' + JSON.stringify(i.grupo) + ', dano:null, x:' + i.x + ', y:' + i.y +
-              (i.custom ? ', custom:true' : '') + '},\n';
-    });
-    code += '  ],\n';
-  });
-  code += '};\n';
-
-  document.getElementById('dan-export-code').value = code;
-  const modal = document.getElementById('dan-export-modal');
-  modal.style.display = 'flex';
 }
 
 
@@ -1420,9 +1153,8 @@ const V360_MOTO_PARTES = [
 
 let v360db = v360makeDb();
 
-// Inicialização: carregar pontos salvos no localStorage
+// Inicialização
 danCarregarCoordenadasSalvas();
-v360CarregarCoordenadasSalvas();
 
 function v360makeDb(){
   const getP = n => V360_MOTO_PARTES.find(p=>parseInt(p.n,10)===n);
@@ -1488,14 +1220,11 @@ function v360EditarResumo(tab, id) {
   setTimeout(() => v360openEdit(id), 80);
 }
 
-function v360del(id){
-  v360db[v360tab] = v360db[v360tab].filter(i=>i.id!==id);
-  v360render();
-}
-
 function v360render(){
   /* 1 — Limpar pinos do canvas */
   document.querySelectorAll('#v360-canvas .v360-pin').forEach(p=>p.remove());
+  const activeImg = v360GetActiveImageEl();
+  const zoomSrc = activeImg ? activeImg.getAttribute('src') : '';
 
   /* 2 — Desenhar pinos dos itens posicionados na aba atual */
   v360db[v360tab].forEach(item=>{
@@ -1511,35 +1240,16 @@ function v360render(){
     pin.innerText  = item.num;
     pin.title      = item.num+' — '+item.nome+': '+(item.dano||'Pendente');
     pin.setAttribute('data-part-label', item.dano ? `${item.nome} — ${item.dano}` : item.nome);
+    pin.setAttribute('data-zoom-src', zoomSrc);
+    pin.setAttribute('data-zoom-x', item.x);
+    pin.setAttribute('data-zoom-y', item.y);
+    pin.setAttribute('data-zoom-scale', '300');
 
-    if (v360ModoEditar) {
-      pin.style.cursor = 'grab';
-      pin.onpointerdown = function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        v360DragState = { id: item.id };
-        pin.style.cursor = 'grabbing';
-        pin.setPointerCapture(e.pointerId);
-      };
-      // Botão ×
-      const del = document.createElement('span');
-      del.className   = 'v360-pin-del';
-      del.textContent = '×';
-      del.title       = 'Remover';
-      del.style.cssText =
-        'position:absolute;top:-5px;right:-5px;width:14px;height:14px;line-height:14px;' +
-        'background:#ef4444;color:#fff;border-radius:50%;font-size:10px;cursor:pointer;' +
-        'text-align:center;pointer-events:auto;z-index:2;';
-      del.onclick = (e) => { e.stopPropagation(); v360del(item.id); };
-      pin.style.position = 'absolute';
-      pin.appendChild(del);
-    } else {
-      pin.onclick = () => v360openEdit(item.id);
-    }
+    pin.onclick = () => v360openEdit(item.id);
 
     document.getElementById('v360-canvas').appendChild(pin);
   });
-  v360BindTooltips(document.getElementById('v360-canvas'));
+  v360BindTooltips(document.getElementById('v360-canvas'), 'v360-part-readout');
 
   /* 3 — Atualizar paleta lateral e resumo */
   v360renderPalette();
