@@ -502,6 +502,13 @@ function danRenderDiagrama() {
 
   // Parse viewBox dimensions
   const [,, vbW, vbH] = cfg.vb.split(' ').map(Number);
+  const isMobile = window.matchMedia('(max-width: 520px)').matches;
+  const padX = isMobile ? (danVeiculo === 'moto' ? vbW * 0.04 : vbW * 0.05) : 0;
+  const padY = isMobile ? (danVeiculo === 'moto' ? vbH * 0.03 : vbH * 0.045) : 0;
+  const drawX = padX;
+  const drawY = padY;
+  const drawW = vbW - (padX * 2);
+  const drawH = vbH - (padY * 2);
   const r     = Math.min(vbW, vbH) * 0.038;
   const rRing = r * 1.45;
   const fSize = r * 0.75;
@@ -511,8 +518,8 @@ function danRenderDiagrama() {
   cfg.pontos.forEach((p, i) => {
     const dano = danDanos[p.id];
     const cor  = dano ? DAN_DMG_COR[dano] : '#F58220';
-    const cx   = (p.px / 100) * vbW;
-    const cy   = (p.py / 100) * vbH;
+    const cx   = drawX + ((p.px / 100) * drawW);
+    const cy   = drawY + ((p.py / 100) * drawH);
 
     if (danModoEditar) {
       const isCustom = p.custom === true;
@@ -556,9 +563,9 @@ function danRenderDiagrama() {
     const isCarro = CARRO_IMGS[cfg.img] !== undefined;
     if (isCarro) {
       bgEl = `<rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#0d1117" rx="12"/>
-    <image href="${ALL_IMGS[cfg.img]}" x="0" y="0" width="${vbW}" height="${vbH}" preserveAspectRatio="xMidYMid meet"/>`;
+    <image href="${ALL_IMGS[cfg.img]}" x="${drawX}" y="${drawY}" width="${drawW}" height="${drawH}" preserveAspectRatio="none"/>`;
     } else {
-      bgEl = `<image href="${ALL_IMGS[cfg.img]}" x="0" y="0" width="${vbW}" height="${vbH}" preserveAspectRatio="xMidYMid meet"/>`;
+      bgEl = `<image href="${ALL_IMGS[cfg.img]}" x="${drawX}" y="${drawY}" width="${drawW}" height="${drawH}" preserveAspectRatio="none"/>`;
     }
   } else {
     bgEl = `<rect x="0" y="0" width="${vbW}" height="${vbH}" fill="#0d1117" rx="12"/>`;
