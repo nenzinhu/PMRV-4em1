@@ -2668,8 +2668,8 @@ function danGerarTexto() {
       if (!its.length) return;
       txt += `\n\n${V360_NAMES[t]}:`;
       [...its].sort((a,b) => a.num - b.num).forEach(i => {
-        const status = `⚠️ ${i.dano}`;
-        txt += `\n• ${String(i.num).padStart(2,'0')} - ${i.nome}: ${status}`;
+        const status = ` ${i.dano}`;
+        txt += `\n• ${i.nome}: ${status}`;
       });
     });
 
