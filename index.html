@@ -551,6 +551,11 @@
         <div id="dan-diagram-area" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:220px;"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px;">
           <p style="font-size:11px;color:var(--label);margin:0;" id="dan-hint-txt">Toque num círculo → escolha o tipo de dano</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-sm" id="dan-edit-btn" type="button" data-click="danToggleEditar()">✏️ Editar círculos</button>
+            <button class="btn btn-sm btn-success" type="button" data-click="danSalvarCoordenadas(this)">💾 Salvar layout</button>
+            <button class="btn btn-sm" type="button" data-click="danExportarCoordenadas()">📤 Exportar</button>
+          </div>
         </div>
       </div>
 
@@ -639,6 +644,11 @@
               <div style="padding:4px 12px 5px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(245,158,11,.06);">↔ Arraste ◯ para a foto · Clique no ◯ na foto para classificar</div>
               <div class="v360-legend-scroll" id="v360-legend-list"></div>
           </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:10px;flex-wrap:wrap;gap:6px;">
+          <button class="btn btn-sm" id="v360-edit-btn" type="button" data-click="v360ToggleEditar()">✏️ Editar círculos</button>
+          <button class="btn btn-sm btn-success" type="button" data-click="v360SalvarCoordenadas(this)">💾 Salvar layout</button>
+          <button class="btn btn-sm" type="button" data-click="v360ExportarCoordenadas()">📤 Exportar</button>
         </div>
       </div>
 

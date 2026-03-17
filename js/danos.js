@@ -531,21 +531,55 @@ function danAtualizarTabs() {
   });
 }
 
-/* ---------------------------------------------------------------
-   DANOS — RENDER SVG
---------------------------------------------------------------- */
-function danRenderDiagrama() {
-  if (!danVeiculo) return;
-  const cfg  = DAN_DIAGRAMAS[danVeiculo][danVista];
-  const area = document.getElementById('dan-diagram-area');
-
-  // Parse viewBox dimensions
+function danGetViewMetrics() {
+  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
   const [,, vbW, vbH] = cfg.vb.split(' ').map(Number);
   const isMobile = window.matchMedia('(max-width: 520px)').matches;
   const imgBox = (isMobile && cfg.img && DAN_IMG_BOXES[cfg.img]) ? DAN_IMG_BOXES[cfg.img] : null;
   const mobileOverrides = isMobile && DAN_MOBILE_POINT_OVERRIDES[danVeiculo]
     ? DAN_MOBILE_POINT_OVERRIDES[danVeiculo][danVista]
     : null;
+  return { cfg, vbW, vbH, isMobile, imgBox, mobileOverrides };
+}
+
+function danStoredToSvgCoords(px, py, metrics) {
+  if (metrics.imgBox) {
+    return {
+      x: ((px - metrics.imgBox.x) / metrics.imgBox.w) * metrics.vbW,
+      y: ((py - metrics.imgBox.y) / metrics.imgBox.h) * metrics.vbH
+    };
+  }
+  return {
+    x: (px / 100) * metrics.vbW,
+    y: (py / 100) * metrics.vbH
+  };
+}
+
+function danSvgToStoredCoords(x, y, metrics) {
+  const clampedX = Math.max(0, Math.min(metrics.vbW, x));
+  const clampedY = Math.max(0, Math.min(metrics.vbH, y));
+  if (metrics.imgBox) {
+    return {
+      px: Math.max(2, Math.min(98, parseFloat((metrics.imgBox.x + (clampedX / metrics.vbW) * metrics.imgBox.w).toFixed(2)))),
+      py: Math.max(2, Math.min(98, parseFloat((metrics.imgBox.y + (clampedY / metrics.vbH) * metrics.imgBox.h).toFixed(2))))
+    };
+  }
+  return {
+    px: Math.max(2, Math.min(98, parseFloat(((clampedX / metrics.vbW) * 100).toFixed(2)))),
+    py: Math.max(2, Math.min(98, parseFloat(((clampedY / metrics.vbH) * 100).toFixed(2))))
+  };
+}
+
+/* ---------------------------------------------------------------
+   DANOS — RENDER SVG
+--------------------------------------------------------------- */
+function danRenderDiagrama() {
+  if (!danVeiculo) return;
+  const metrics = danGetViewMetrics();
+  const cfg  = metrics.cfg;
+  const area = document.getElementById('dan-diagram-area');
+
+  const { vbW, vbH, imgBox, mobileOverrides } = metrics;
   const r     = Math.min(vbW, vbH) * 0.038;
   const rRing = r * 1.45;
   const fSize = r * 0.75;
@@ -553,17 +587,18 @@ function danRenderDiagrama() {
   // Build hotspot circles as SVG elements (% coordinates → svg units)
   let hs = '';
   cfg.pontos.forEach((p, i) => {
-    const ref = mobileOverrides && mobileOverrides[p.id] ? {...p, ...mobileOverrides[p.id]} : p;
+    const ref = mobileOverrides && mobileOverrides[p.id] && !p.saved ? { ...p, ...mobileOverrides[p.id] } : p;
     const dano = danDanos[p.id];
     const cor  = dano ? DAN_DMG_COR[dano] : '#F58220';
-    const cx   = imgBox ? (((ref.px - imgBox.x) / imgBox.w) * vbW) : ((ref.px / 100) * vbW);
-    const cy   = imgBox ? (((ref.py - imgBox.y) / imgBox.h) * vbH) : ((ref.py / 100) * vbH);
+    const coords = danStoredToSvgCoords(ref.px, ref.py, metrics);
+    const cx   = coords.x;
+    const cy   = coords.y;
 
     if (danModoEditar) {
       const isCustom = p.custom === true;
       // No modo editar: drag para mover, botão × para remover
       hs += `
-      <g id="danG_${p.id}" style="cursor:grab;transform-origin:${cx}px ${cy}px"
+      <g id="danG_${p.id}" class="dan-hotspot-edit" style="cursor:grab;transform-origin:${cx}px ${cy}px"
          data-pointerdown="danDragStart(event,'${p.id}')">
         <circle cx="${cx}" cy="${cy}" r="${rRing}" fill="none" stroke="#F58220" stroke-width="1.5" stroke-dasharray="4 2"/>
         <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(245,130,32,0.25)" stroke="#F58220" stroke-width="2"/>
@@ -634,6 +669,7 @@ function danRenderDiagrama() {
     : '';
 
   area.innerHTML = `<svg id="dan-svg-main" viewBox="${cfg.vb}" xmlns="http://www.w3.org/2000/svg"
+    class="${danModoEditar ? 'dan-editing-svg' : ''}"
     style="width:100%;max-width:560px;height:auto;display:block;border-radius:12px;${danModoEditar?'outline:2px dashed #F58220;':''}">
     ${bgEl}
     ${editOverlay}
@@ -665,14 +701,13 @@ function danSvgCoordenadas(event) {
 function danAdicionarPontoNoClique(event, overlayEl) {
   // o clique deve ser no overlay (rect), não nos círculos
   if (event.target !== overlayEl) return;
-  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
-  const [,, vbW, vbH] = cfg.vb.split(' ').map(Number);
+  const metrics = danGetViewMetrics();
+  const cfg = metrics.cfg;
   const pt  = danSvgCoordenadas(event);
-  const px  = parseFloat(((pt.x / vbW) * 100).toFixed(2));
-  const py  = parseFloat(((pt.y / vbH) * 100).toFixed(2));
+  const stored = danSvgToStoredCoords(pt.x, pt.y, metrics);
   danPontoCustomCount++;
   const id  = 'C' + danVeiculo + danVista.charAt(0).toUpperCase() + danPontoCustomCount;
-  cfg.pontos.push({ id, label: 'Ponto extra ' + danPontoCustomCount, px, py, custom: true });
+  cfg.pontos.push({ id, label: 'Ponto extra ' + danPontoCustomCount, px: stored.px, py: stored.py, custom: true, saved: true });
   danRenderDiagrama();
 }
 
@@ -687,35 +722,62 @@ function danRemoverPonto(id) {
 }
 
 function danDragStart(event, id) {
+  if (event.target.closest('[data-click^="danRemoverPonto"]')) return;
   event.stopPropagation();
   event.preventDefault();
-  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
+  const metrics = danGetViewMetrics();
+  const cfg = metrics.cfg;
   const p   = cfg.pontos.find(q => q.id === id);
   if (!p) return;
-  danDragState = { id, origPx: p.px, origPy: p.py,
-                   startClientX: event.clientX, startClientY: event.clientY };
+  const startSvg = danSvgCoordenadas(event);
+  const origSvg = danStoredToSvgCoords(p.px, p.py, metrics);
+  if (event.declarativeTarget && event.declarativeTarget.setPointerCapture) {
+    try { event.declarativeTarget.setPointerCapture(event.pointerId); } catch (e) {}
+  }
+  danDragState = {
+    id,
+    pointerId: event.pointerId,
+    metrics,
+    groupId: 'danG_' + id,
+    origSvgX: origSvg.x,
+    origSvgY: origSvg.y,
+    startSvgX: startSvg.x,
+    startSvgY: startSvg.y,
+    pendingPx: p.px,
+    pendingPy: p.py
+  };
 }
 
 function danDragMove(event) {
-  if (!danDragState) return;
-  const svg = document.getElementById('dan-svg-main');
-  if (!svg) return;
-  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
-  const [,, vbW, vbH] = cfg.vb.split(' ').map(Number);
-  const rect  = svg.getBoundingClientRect();
-  const scaleX = vbW / rect.width;
-  const scaleY = vbH / rect.height;
-  const dx    = (event.clientX - danDragState.startClientX) * scaleX;
-  const dy    = (event.clientY - danDragState.startClientY) * scaleY;
-  const p     = cfg.pontos.find(q => q.id === danDragState.id);
-  if (!p) return;
-  p.px = Math.max(2, Math.min(98, parseFloat((danDragState.origPx + (dx / vbW * 100)).toFixed(2))));
-  p.py = Math.max(2, Math.min(98, parseFloat((danDragState.origPy + (dy / vbH * 100)).toFixed(2))));
-  danRenderDiagrama();
+  if (!danDragState || (danDragState.pointerId !== undefined && event.pointerId !== danDragState.pointerId)) return;
+  event.preventDefault();
+  const pt = danSvgCoordenadas(event);
+  const newSvgX = danDragState.origSvgX + (pt.x - danDragState.startSvgX);
+  const newSvgY = danDragState.origSvgY + (pt.y - danDragState.startSvgY);
+  const stored = danSvgToStoredCoords(newSvgX, newSvgY, danDragState.metrics);
+  const clampedSvg = danStoredToSvgCoords(stored.px, stored.py, danDragState.metrics);
+  danDragState.pendingPx = stored.px;
+  danDragState.pendingPy = stored.py;
+  const group = document.getElementById(danDragState.groupId);
+  if (group) {
+    group.setAttribute(
+      'transform',
+      `translate(${(clampedSvg.x - danDragState.origSvgX).toFixed(2)} ${(clampedSvg.y - danDragState.origSvgY).toFixed(2)})`
+    );
+  }
 }
 
-function danDragEnd() {
+function danDragEnd(event) {
+  if (!danDragState || (event && danDragState.pointerId !== undefined && event.pointerId !== danDragState.pointerId)) return;
+  const cfg = DAN_DIAGRAMAS[danVeiculo][danVista];
+  const p = cfg.pontos.find(q => q.id === danDragState.id);
+  if (p) {
+    p.px = danDragState.pendingPx;
+    p.py = danDragState.pendingPy;
+    p.saved = true;
+  }
   danDragState = null;
+  danRenderDiagrama();
 }
 
 /* ---------------------------------------------------------------
@@ -729,7 +791,7 @@ function danSalvarCoordenadas(btn) {
   ['frontal','traseira','esquerda','direita'].forEach(vista => {
     const key = danVeiculo + '_' + vista;
     saved[key] = DAN_DIAGRAMAS[danVeiculo][vista].pontos.map(p => ({
-      id: p.id, label: p.label, px: p.px, py: p.py, custom: p.custom || false
+      id: p.id, label: p.label, px: p.px, py: p.py, custom: p.custom || false, saved: true
     }));
   });
   localStorage.setItem(DAN_STORAGE_KEY, JSON.stringify(saved));
@@ -803,7 +865,7 @@ function danCarregarCoordenadasSalvas() {
     ['frontal','traseira','esquerda','direita'].forEach(vista => {
       const key = tipo + '_' + vista;
       if (saved[key] && DAN_DIAGRAMAS[tipo] && DAN_DIAGRAMAS[tipo][vista]) {
-        DAN_DIAGRAMAS[tipo][vista].pontos = saved[key];
+        DAN_DIAGRAMAS[tipo][vista].pontos = saved[key].map(p => ({ ...p, saved: true }));
       }
     });
   });
@@ -865,6 +927,7 @@ function v360ToggleEditar() {
     btn.style.color        = '#F58220';
     hint.textContent = 'Modo editar: toque na imagem para adicionar pino · arraste para mover · × para remover';
     hint.style.color = '#F58220';
+    document.getElementById('v360-canvas').classList.add('editing');
     // Ativar clique no canvas para adicionar pino
     document.getElementById('v360-canvas').addEventListener('click', v360CanvasClick);
     document.addEventListener('pointermove', v360PinDragMove);
@@ -875,6 +938,7 @@ function v360ToggleEditar() {
     btn.style.color        = '';
     hint.textContent = 'Toque nos círculos para registrar os danos.';
     hint.style.color = '';
+    document.getElementById('v360-canvas').classList.remove('editing');
     document.getElementById('v360-canvas').removeEventListener('click', v360CanvasClick);
     document.removeEventListener('pointermove', v360PinDragMove);
     document.removeEventListener('pointerup',   v360PinDragEnd);
@@ -1390,6 +1454,7 @@ function v360render(){
       pin.style.cursor = 'grab';
       pin.onpointerdown = function(e){
         e.stopPropagation();
+        e.preventDefault();
         v360DragState = { id: item.id };
         pin.style.cursor = 'grabbing';
         pin.setPointerCapture(e.pointerId);

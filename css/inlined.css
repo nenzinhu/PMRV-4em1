@@ -1019,6 +1019,8 @@
     }
     .vtr-btn.vtr-manual-btn { font-size: 12px; color: var(--label); }
     .vtr-btn.vtr-manual-btn.active { border-color: var(--marrom); background: rgba(148,120,92,.15); color: #bba07a; box-shadow: 0 0 0 2px rgba(148,120,92,.18); }
+    .dan-editing-svg{touch-action:none;user-select:none;-webkit-user-select:none;}
+    .dan-hotspot-edit{touch-action:none;}
 
     /* Melhorar toque em dispositivos mobile */
     @media (pointer: coarse) {
@@ -1036,11 +1038,12 @@
     ============================================================ */
     .v360-wrap{display:flex;gap:14px;flex-wrap:wrap;}
     .v360-canvas{position:relative;flex:1;min-width:260px;background:#0d1117;border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:default;}
+    .v360-canvas.editing{touch-action:none;}
     .v360-canvas img.moto-img{width:100%;display:none;pointer-events:none;user-select:none;-webkit-user-select:none;}
     .v360-canvas img.moto-img.active{display:block;}
     .v360-hint{display:none;position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(251,191,36,.9);color:#000;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;white-space:nowrap;z-index:4;pointer-events:none;}
     .v360-hint.show{display:block;}
-    .v360-pin{position:absolute;width:28px;height:28px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);z-index:3;border:2px solid #fff;transition:transform .15s,opacity .15s;user-select:none;}
+    .v360-pin{position:absolute;width:28px;height:28px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);z-index:3;border:2px solid #fff;transition:transform .15s,opacity .15s;user-select:none;touch-action:none;}
     .v360-pin:hover{transform:translate(-50%,-50%) scale(1.1);}
     .v360-pin.avaria{animation:v360pulse 1.5s infinite;}
     @keyframes v360pulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,.5)}50%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}
