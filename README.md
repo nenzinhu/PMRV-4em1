@@ -46,6 +46,10 @@ python patch_carro360.py
 
 Faça um backup do seu `index.html` antes de rodar esse patch.
 
+## Manual
+
+O manual funcional do aplicativo esta em [MANUAL_DE_USO.md](C:\Users\Nei\Desktop\Projetos\PMRV-4em1-main\MANUAL_DE_USO.md).
+
 ## Sobre
 
 Este projeto é mantido por Nei. Para sugestões e contribuições, abra issues ou pull requests no GitHub.
