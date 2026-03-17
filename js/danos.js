@@ -26,6 +26,34 @@ const DAN_IMG_BOXES = {
   moto_esquerda: { x: 1.47,  y: 3.68,  w: 96.08, h: 86.52 }
 };
 
+const DAN_MOBILE_POINT_OVERRIDES = {
+  carro: {
+    frontal: {
+      F1:{px:43.43,py:46.80}, F2:{px:50.00,py:56.22}, F3:{px:53.58,py:29.54},
+      F4:{px:34.48,py:58.57}, F5:{px:65.52,py:57.78}, F6:{px:34.48,py:74.26},
+      F7:{px:66.71,py:73.48}, F8:{px:57.16,py:64.85}, F9:{px:55.97,py:75.05},
+      F10:{px:30.90,py:39.74}, F11:{px:69.10,py:38.96}, F12:{px:29.70,py:62.49},
+      F13:{px:72.09,py:64.85}, F14:{px:50.00,py:73.48}
+    },
+    traseira: {
+      T1:{px:35.82,py:62.11}, T2:{px:62.06,py:62.11}, T3:{px:45.41,py:41.24},
+      T4:{px:42.88,py:70.86}, T5:{px:52.47,py:78.27}, T6:{px:39.85,py:86.34},
+      T7:{px:35.82,py:79.62}, T8:{px:59.65,py:81.64}, T9:{px:48.94,py:55.38},
+      T10:{px:48.94,py:64.14}
+    },
+    esquerda: {
+      E1:{px:20.11,py:81.33}, E2:{px:77.79,py:83.02}, E3:{px:44.45,py:73.65},
+      E4:{px:61.58,py:74.24}, E5:{px:39.04,py:57.70}, E6:{px:55.26,py:54.74},
+      E7:{px:12.90,py:78.38}
+    },
+    direita: {
+      D1:{px:20.63,py:82.14}, D2:{px:74.03,py:81.55}, D3:{px:43.25,py:74.37},
+      D4:{px:59.54,py:74.37}, D5:{px:38.73,py:57.64}, D6:{px:54.86,py:55.85},
+      D7:{px:11.58,py:79.15}
+    }
+  }
+};
+
 /* Pontos de hotspot por vista (% da largura/altura da imagem para posicionamento) */
 const DAN_DIAGRAMAS = {
   carro: {
@@ -515,6 +543,9 @@ function danRenderDiagrama() {
   const [,, vbW, vbH] = cfg.vb.split(' ').map(Number);
   const isMobile = window.matchMedia('(max-width: 520px)').matches;
   const imgBox = (isMobile && cfg.img && DAN_IMG_BOXES[cfg.img]) ? DAN_IMG_BOXES[cfg.img] : null;
+  const mobileOverrides = isMobile && DAN_MOBILE_POINT_OVERRIDES[danVeiculo]
+    ? DAN_MOBILE_POINT_OVERRIDES[danVeiculo][danVista]
+    : null;
   const r     = Math.min(vbW, vbH) * 0.038;
   const rRing = r * 1.45;
   const fSize = r * 0.75;
@@ -522,10 +553,11 @@ function danRenderDiagrama() {
   // Build hotspot circles as SVG elements (% coordinates → svg units)
   let hs = '';
   cfg.pontos.forEach((p, i) => {
+    const ref = mobileOverrides && mobileOverrides[p.id] ? {...p, ...mobileOverrides[p.id]} : p;
     const dano = danDanos[p.id];
     const cor  = dano ? DAN_DMG_COR[dano] : '#F58220';
-    const cx   = imgBox ? (((p.px - imgBox.x) / imgBox.w) * vbW) : ((p.px / 100) * vbW);
-    const cy   = imgBox ? (((p.py - imgBox.y) / imgBox.h) * vbH) : ((p.py / 100) * vbH);
+    const cx   = imgBox ? (((ref.px - imgBox.x) / imgBox.w) * vbW) : ((ref.px / 100) * vbW);
+    const cy   = imgBox ? (((ref.py - imgBox.y) / imgBox.h) * vbH) : ((ref.py / 100) * vbH);
 
     if (danModoEditar) {
       const isCustom = p.custom === true;
@@ -1271,10 +1303,10 @@ function v360makeDb(){
   const getP = n => V360_MOTO_PARTES.find(p=>parseInt(p.n,10)===n);
   const mk   = (num,x,y) => { const p=getP(num); return {id:num*1000,num,nome:p?p.t:'',grupo:p?p.g:'',dano:null,x,y}; };
   return {
-    frente:   [mk(1,52.77,38.7), mk(2,54.53,61.5), mk(3,55.63,90.92), mk(5,38.91,55.57), mk(6,65.98,55.03), mk(7,33.63,42.88), mk(8,76.98,44.1)],
-    tras:     [mk(9,17.56,7.98), mk(10,21.3,16.75), mk(12,80.28,53.86), mk(14,77.64,48.19), mk(16,93.49,8.86), mk(17,85.56,15.75), mk(19,26.14,53.19), mk(24,53.43,71.96), mk(25,70.38,71.08), mk(26,41.11,71.08), mk(27,52.77,92.52), mk(30,36.27,59.3), mk(32,55.41,24.4), mk(33,55.19,46.72)],
-    direita:  [mk(11,46.17,22.67), mk(13,19.32,31), mk(28,18.44,42.67), mk(29,34.51,29.96), mk(31,8.1,24.33)],
-    esquerda: [mk(4,9.64,46.62), mk(18,58.49,29.75), mk(20,45.51,46), mk(21,69.06,40.38)]
+    frente:   [mk(1,50.0,33.0), mk(2,50.0,58.0), mk(3,50.0,89.0), mk(5,32.0,54.0), mk(6,68.0,54.0), mk(7,22.0,42.0), mk(8,78.0,42.0)],
+    tras:     [mk(9,13.0,4.0), mk(10,16.0,14.0), mk(12,80.0,49.0), mk(14,73.0,43.0), mk(16,88.0,4.0), mk(17,85.0,13.0), mk(19,25.0,47.0), mk(24,50.0,72.0), mk(25,67.0,72.0), mk(26,35.0,72.0), mk(27,49.0,93.0), mk(30,28.0,58.0), mk(32,50.0,24.0), mk(33,50.0,43.0)],
+    direita:  [mk(11,46.0,33.0), mk(13,19.0,48.0), mk(28,18.0,69.0), mk(29,34.0,46.0), mk(31,7.0,36.0)],
+    esquerda: [mk(4,10.0,72.0), mk(18,58.0,46.0), mk(20,43.0,72.0), mk(21,65.0,63.0)]
   };
 }
 
