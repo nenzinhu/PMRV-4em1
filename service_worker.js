@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pmrv-4em1-v2';
+const CACHE_NAME = 'pmrv-4em1-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -13,13 +13,19 @@ const APP_SHELL = [
   './js/relatorio.js',
   './icon-192.png',
   './icon-512.png',
+  './icon.png',
   './relatorio.png',
+  './AJUDA.png',
   './service_worker.js',
   './img/extracted_1.png',
   './img/extracted_2.png',
   './img/extracted_3.png',
   './img/extracted_4.png',
-  './img/extracted_5.png'
+  './img/extracted_5.png',
+  './img/extracted_8.png',
+  './img/extracted_9.png',
+  './img/extracted_10.png',
+  './img/extracted_11.png'
 ];
 
 self.addEventListener('install', event => {

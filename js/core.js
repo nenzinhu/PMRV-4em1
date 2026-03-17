@@ -32,17 +32,7 @@ function go(name) {
   // Inicializar telas que precisam de setup
   if (name === 'envolvidos' && document.getElementById('env_lista').children.length === 0) env_adicionar();
   if (name === 'danos') {
-    document.getElementById('dan-step-vehicle').style.display = 'block';
-    document.getElementById('dan-step-diagram').style.display = 'none';
-    document.getElementById('dan-step-moto360').style.display = 'none';
-    danVeiculo = null; danDanos = {};
-    danVeiculosSalvos = [];
-    v360db = v360makeDb();
-    document.getElementById('dan-btn-carro').classList.remove('active');
-    document.getElementById('dan-btn-moto').classList.remove('active');
-    document.getElementById('dan-salvos-area').style.display = 'none';
-    danFotoLimpar('dan-foto-grid-carro','dan-foto-actions-carro');
-    danFotoLimpar('dan-foto-grid-moto','dan-foto-actions-moto');
+    danPrepararTela();
   }
   if (name === 'pmrv') { pmrv_verificarRodovia(); pmrv_mudarSubtipo(); pmrv_atualizar(); }
   if (name === 'relatorio') {
