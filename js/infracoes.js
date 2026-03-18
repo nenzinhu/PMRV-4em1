@@ -249,11 +249,11 @@
   function normalizeCategory(value) {
     const normalized = normalizeHeader(value);
     if (!normalized) return 'Sem categoria';
-    if (normalized.includes('gravissima')) return 'Gravíssima';
+    if (normalized.includes('gravissima') || normalized.includes('graviss')) return 'Gravíssima';
     if (normalized.includes('grave')) return 'Grave';
     if (normalized.includes('media')) return 'Média';
     if (normalized.includes('leve')) return 'Leve';
-    return safeText(value) || 'Sem categoria';
+    return 'Sem categoria';
   }
 
   function categoryClass(value) {
@@ -579,6 +579,29 @@
     }));
   }
 
+  function loadOptionalText(paths) {
+    const queue = Array.isArray(paths) ? paths.slice() : [paths];
+
+    function next() {
+      if (!queue.length) return Promise.resolve('');
+
+      const currentPath = queue.shift();
+      return fetch(currentPath, { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) return next();
+          return response.arrayBuffer()
+            .then(function (buffer) {
+              return new TextDecoder('utf-8').decode(buffer);
+            });
+        })
+        .catch(function () {
+          return next();
+        });
+    }
+
+    return next();
+  }
+
   function loadCsv() {
     const elements = getElements();
     elements.status.textContent = 'Carregando base...';
@@ -595,18 +618,7 @@
             return new TextDecoder('utf-8').decode(buffer);
           });
 
-    const fishPromise = fetch('./fish.csv', { cache: 'no-store' })
-      .then(function (response) {
-        if (!response.ok) return '';
-        return response.arrayBuffer();
-      })
-      .then(function (buffer) {
-        if (!buffer) return '';
-        return new TextDecoder('utf-8').decode(buffer);
-      })
-      .catch(function () {
-        return '';
-      });
+    const fishPromise = loadOptionalText(['./fish.cleaned.csv', './fish.csv']);
 
     return Promise.all([basePromise, fishPromise]);
   }
