@@ -48,7 +48,6 @@
           <h2 class="card-title">O que você precisa?</h2>
           <p class="card-sub">Escolha o módulo para começar.</p>
         </div>
-        <button class="btn btn-primary btn-lg" data-click="go('assumir')" aria-label="Ir para Iniciando o Serviço">Iniciando o Serviço →</button>
       </div>
 
       <div class="menu-grid" role="navigation" aria-label="Módulos disponíveis">
@@ -56,6 +55,13 @@
           <div class="menu-icon"><img src="img/extracted_2.png" alt="Viatura PMRv" class="menu-icon-img menu-icon-img-vtr" /></div>
           <div class="menu-title">Iniciando o Serviço</div>
           <div class="menu-desc">Gerar texto de início de serviço</div>
+          <span class="menu-arrow">›</span>
+        </button>
+
+        <button class="menu-card" data-color="amber" data-click="go('infracoes')">
+          <div class="menu-icon"><img src="infrações.png" alt="Consulta de Infrações" class="menu-icon-img menu-icon-img-infra" /></div>
+          <div class="menu-title">Consulta de Infrações</div>
+          <div class="menu-desc">Pesquisar diretamente na base local do aplicativo</div>
           <span class="menu-arrow">›</span>
         </button>
 
@@ -219,6 +225,9 @@
             <select id="ass_local">
               <option>P19</option>
               <option>Ponte</option>
+              <option>SC-400</option>
+              <option>SC-402</option>
+              <option>SC-403</option>
               <option>Viatura de apoio no P19</option>
               <option>Setor 3 – Área Central / Pontes</option>
               <option>Apoio / Futebol</option>
@@ -304,7 +313,10 @@
           <div class="form-field">
             <label class="field-label">Rodovia</label>
             <select id="pmrv_rodovia" data-change="pmrv_verificarRodovia()">
+              <option value="SC-400">SC-400</option>
               <option value="SC-401">SC-401</option>
+              <option value="SC-402">SC-402</option>
+              <option value="SC-403">SC-403</option>
               <option value="SC-405">SC-405</option>
               <option value="SC-406">SC-406</option>
               <option value="SC-281">SC-281</option>
@@ -745,6 +757,162 @@
   </section>
 
   <!-- ============================================================
+       CONSULTA DE INFRAÇÕES
+  ============================================================ -->
+  <section id="screen-infracoes" class="screen screen-app">
+    <div class="back-row">
+      <button class="btn" data-click="go('home')">← Voltar</button>
+      <button class="btn btn-danger" data-click="go('ended')">Sair</button>
+    </div>
+
+    <div class="card infra-page">
+      <div class="infra-hero">
+        <div class="infra-hero-copy">
+          <h2 class="card-title infra-title">Consulta de Infrações</h2>
+          <p class="card-sub infra-sub">Pesquisa direta na base local com filtros por texto, categoria e medida administrativa, sem abrir outra página.</p>
+        </div>
+      </div>
+
+      <div class="infra-filter-grid">
+        <div class="form-field">
+          <label class="field-label" for="infra_search">Busca geral</label>
+          <input id="infra_search" type="search" placeholder="Código, descrição, artigo, categoria, infrator ou medida">
+        </div>
+        <div class="form-field">
+          <label class="field-label" for="infra_category">Categoria</label>
+          <select id="infra_category">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label" for="infra_measure">Medida administrativa</label>
+          <select id="infra_measure">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="form-field infra-filter-action">
+          <label class="field-label">Ações</label>
+          <button id="infra_clear" class="btn btn-primary btn-full" type="button">Limpar filtros</button>
+        </div>
+      </div>
+
+      <div class="infra-tabs" role="tablist" aria-label="Seções da consulta de infrações">
+        <button id="infra_tab_consulta" class="infra-tab-btn active" type="button" data-click="infra_showTab('consulta')">Consulta</button>
+        <button id="infra_tab_frequentes" class="infra-tab-btn" type="button" data-click="infra_showTab('frequentes')">Infrações Frequente</button>
+      </div>
+
+      <div id="infra_panel_consulta" class="infra-tab-panel active">
+        <div class="infra-stats">
+          <article class="infra-stat">
+            <span class="infra-stat-label">Total de infrações</span>
+            <strong id="infra_totalCount">0</strong>
+          </article>
+          <article class="infra-stat">
+            <span class="infra-stat-label">Resultados exibidos</span>
+            <strong id="infra_filteredCount">0</strong>
+          </article>
+          <article class="infra-stat">
+            <span class="infra-stat-label">Categorias</span>
+            <strong id="infra_categoryCount">0</strong>
+          </article>
+        </div>
+
+        <div class="infra-panel">
+          <div class="infra-panel-head">
+            <div>
+              <div id="infra_status" class="infra-status">Carregando base...</div>
+              <p id="infra_summary" class="infra-summary">Aguarde enquanto os registros são preparados.</p>
+            </div>
+          </div>
+
+          <div class="infra-table-wrap">
+            <table class="infra-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Descrição</th>
+                  <th>Artigo / Decreto</th>
+                  <th>Infrator</th>
+                  <th>Categoria</th>
+                  <th>Medida administrativa</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody id="infra_tableBody"></tbody>
+            </table>
+            <div id="infra_emptyState" class="infra-empty" hidden>Nenhum resultado encontrado para os filtros atuais.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="infra_panel_frequentes" class="infra-tab-panel" hidden>
+        <div class="infra-frequent-grid">
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('5010-0')">
+            <span class="infra-frequent-code">Código: 5010-0</span>
+            <strong>Dirigir sem CNH/PPD/ACC</strong>
+            <span class="infra-frequent-art">Art. 162</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('6637-2')">
+            <span class="infra-frequent-code">Código: 6637-2</span>
+            <strong>Equipamento em desacordo com o Contran</strong>
+            <span class="infra-frequent-art">Art. 230</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('6610-2')">
+            <span class="infra-frequent-code">Código: 6610-2</span>
+            <strong>Iluminação/sinalização alterada</strong>
+            <span class="infra-frequent-art">Art. 230</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('5185-1')">
+            <span class="infra-frequent-code">Código: 5185-1</span>
+            <strong>Desobedecer ordem de agente</strong>
+            <span class="infra-frequent-art">Art. 195</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('5185-0')">
+            <span class="infra-frequent-code">Código: 5185-0</span>
+            <strong>Não usar cinto de segurança</strong>
+            <span class="infra-frequent-art">Art. 167</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('6599-2')">
+            <span class="infra-frequent-code">Código: 6599-2</span>
+            <strong>Veículo em mau estado de conservação</strong>
+            <span class="infra-frequent-art">Art. 230</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('6599-0')">
+            <span class="infra-frequent-code">Código: 6599-0</span>
+            <strong>Veículo não licenciado</strong>
+            <span class="infra-frequent-art">Art. 230</span>
+          </button>
+          <button class="infra-frequent-card" type="button" data-click="infra_applyShortcut('5738-0')">
+            <span class="infra-frequent-code">Código: 5738-0</span>
+            <strong>Ultrapassar em faixa contínua amarela (contramão)</strong>
+            <span class="infra-frequent-art">Art. 203</span>
+          </button>
+          <button class="infra-frequent-card infra-frequent-card--highlight" type="button" data-click="infra_applyShortcut('7579-0')">
+            <span class="infra-frequent-code">Código: 7579-0</span>
+            <strong>Recusar teste do etilômetro</strong>
+            <span class="infra-frequent-art">Art. 165-A</span>
+          </button>
+          <button class="infra-frequent-card infra-frequent-card--highlight" type="button" data-click="infra_applyShortcut('5010-0')">
+            <span class="infra-frequent-code">Código: 5010-0</span>
+            <strong>Dirigir sem CNH</strong>
+            <span class="infra-frequent-art">Art. 162</span>
+          </button>
+          <button class="infra-frequent-card infra-frequent-card--highlight" type="button" data-click="infra_applyShortcut('7366-2')">
+            <span class="infra-frequent-code">Código: 7366-2</span>
+            <strong>Usar celular ao dirigir</strong>
+            <span class="infra-frequent-art">Art. 252, VI</span>
+          </button>
+          <button class="infra-frequent-card infra-frequent-card--highlight" type="button" data-click="infra_applyShortcut('5746-1')">
+            <span class="infra-frequent-code">Código: 5746-1</span>
+            <strong>Transitar pelo acostamento</strong>
+            <span class="infra-frequent-art">Art. 193</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
        AJUDA
   ============================================================ -->
   <section id="screen-help" class="screen">
@@ -813,6 +981,28 @@
             <li>Baixe o texto em `.txt` se necessário.</li>
             <li>Compartilhe só as fotos dos envolvidos e do local.</li>
             <li>Você pode anexar até 2 fotos do local nesta tela.</li>
+          </ul>
+        </section>
+
+        <section class="help-block">
+          <h3 class="help-title">Consulta de Infrações</h3>
+          <p class="help-text">Permite pesquisar rapidamente na base local de infrações.</p>
+          <ul class="help-list">
+            <li>Use a busca geral para localizar por código, descrição, artigo ou infrator.</li>
+            <li>Refine o resultado pelos filtros de categoria e medida administrativa.</li>
+            <li>A aba Consulta mostra os resultados completos da base carregada.</li>
+            <li>Ao tocar em uma infração frequente, a pesquisa é aplicada automaticamente.</li>
+          </ul>
+        </section>
+
+        <section class="help-block">
+          <h3 class="help-title">Infrações Frequente</h3>
+          <p class="help-text">Reúne os códigos mais usados para acesso rápido.</p>
+          <ul class="help-list">
+            <li>Toque no card da infração desejada para abrir a consulta com o código preenchido.</li>
+            <li>Os códigos aparecem destacados para facilitar a identificação visual.</li>
+            <li>Depois do toque, a tela volta para a aba de consulta com o filtro aplicado.</li>
+            <li>Use essa aba quando já souber a infração mais comum que deseja localizar.</li>
           </ul>
         </section>
 
@@ -910,6 +1100,8 @@
   <script src="js/pmrv.js"></script>
   <script src="js/danos.js"></script>
   <script src="js/relatorio.js"></script>
+  <script src="js/infracoes-data.js"></script>
+  <script src="js/infracoes.js"></script>
 
 </body>
 </html>

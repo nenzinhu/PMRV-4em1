@@ -39,7 +39,7 @@ function pmrv_verificarRodovia() {
   const cidade = document.getElementById('pmrv_cidade');
   const sel407 = document.getElementById('pmrv_cidade_407');
   const sel281 = document.getElementById('pmrv_cidade_281');
-  const fixas = ['SC-401','SC-405','SC-406'];
+  const fixas = ['SC-400','SC-401','SC-402','SC-403','SC-405','SC-406'];
 
   sel407.classList.add('hidden');
   sel281.classList.add('hidden');

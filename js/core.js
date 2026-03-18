@@ -20,13 +20,15 @@ document.addEventListener('DOMContentLoaded', function(){
 /* ---------------------------------------------------------------
    NAVEGAÇÃO
 --------------------------------------------------------------- */
-const SCREENS = ['home','assumir','envolvidos','pmrv','danos','relatorio','help','ended'];
+const SCREENS = ['home','assumir','envolvidos','pmrv','danos','relatorio','infracoes','help','ended'];
 
 function go(name) {
   SCREENS.forEach(id => {
     const el = document.getElementById('screen-' + id);
     if (el) el.classList.toggle('active', id === name);
   });
+  const app = document.querySelector('.app');
+  if (app) app.classList.toggle('app-wide', name === 'infracoes');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Inicializar telas que precisam de setup
@@ -39,6 +41,9 @@ function go(name) {
     document.getElementById('rel-count-env').textContent = document.querySelectorAll('#env_lista .person-card').length || '0';
     document.getElementById('rel-count-dan').textContent = danVeiculosSalvos.length || '0';
     document.getElementById('rel-result-area').style.display = 'none';
+  }
+  if (name === 'infracoes' && typeof window.infra_init === 'function') {
+    window.infra_init();
   }
 }
 
