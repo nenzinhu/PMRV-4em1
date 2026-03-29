@@ -1,6 +1,6 @@
 {
   "appId": "br.gov.sc.pmrv.quatroemum",
-  "appName": "PMRv 4 em 1",
+  "appName": "PMRv Operacional",
   "webDir": "capacitor-www",
   "bundledWebRuntime": false
 }

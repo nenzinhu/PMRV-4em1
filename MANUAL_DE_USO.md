@@ -2,10 +2,10 @@
 
 ## Visao Geral
 
-O **PMRv 4 em 1** e um aplicativo para apoiar o registro operacional, reunindo cinco modulos principais:
+O **PMRv Operacional** e um aplicativo para apoiar o registro operacional, reunindo cinco modulos principais:
 
 - `Assuncao de Servico`
-- `Relato de Envolvidos`
+- `Prévia de Registro: Condutores/Vítimas`
 - `Relato Policial`
 - `Danos Aparentes`
 - `Relatorio Completo`
@@ -17,7 +17,7 @@ O acesso a cada modulo e feito pelo menu inicial da aplicacao.
 Ao abrir o app, voce vera as opcoes principais:
 
 - `Assuncao de Servico`: gera o texto de inicio de servico.
-- `Relato de Envolvidos`: registra pessoas, veiculos, relados e fotos.
+- `Prévia de Registro: Condutores/Vítimas`: registra pessoas, veiculos, relados e fotos.
 - `Relato Policial`: monta o texto padrao da ocorrencia.
 - `Danos Aparentes`: registra avarias de carro ou motocicleta.
 - `Relatorio Completo`: consolida envolvidos e danos em um unico texto.
@@ -56,7 +56,7 @@ O sistema monta o texto final e oferece:
 - `Copiar`
 - `WhatsApp`
 
-## 2. Relato de Envolvidos
+## 2. Prévia de Registro: Condutores/Vítimas
 
 ### Objetivo
 
@@ -64,7 +64,7 @@ Registrar os envolvidos no sinistro com dados basicos, relato e fotos.
 
 ### Como usar
 
-1. Acesse `Relato de Envolvidos`.
+1. Acesse `Prévia de Registro: Condutores/Vítimas`.
 2. Clique em `Adicionar Envolvido`.
 3. Preencha:
    - tipo
@@ -211,7 +211,7 @@ Em alguns navegadores mobile, a opcao pode abrir o compartilhamento nativo. Em n
 Para um atendimento completo, o fluxo mais indicado e:
 
 1. `Assuncao de Servico`
-2. `Relato de Envolvidos`
+2. `Prévia de Registro: Condutores/Vítimas`
 3. `Relato Policial`
 4. `Danos Aparentes`
 5. `Relatorio Completo`

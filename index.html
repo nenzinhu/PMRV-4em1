@@ -5,11 +5,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Ferramenta 4 em 1 para PMRv - Iniciando o Serviço, Envolvidos, Relatório e Danos" />
+  <meta name="description" content="PMRv Operacional - Iniciando o Serviço, Envolvidos, Relatório e Danos" />
   <meta name="theme-color" content="#07090f" />
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>4 em 1 · PMRv</title>
+  <title>PMRv Operacional</title>
 
     <link rel="stylesheet" href="css/inlined.css">
     <link rel="stylesheet" href="css/style.css">
@@ -25,9 +25,9 @@
     <div class="brand">
       <img src="img/extracted_1.png" alt="Brasão PMRv" class="brand-logo" aria-hidden="true" />
       
-      <span class="brand-pill" aria-label="Sistema PMRv 4 em 1 - Online">
+      <span class="brand-pill" aria-label="Sistema PMRv Operacional - Online">
         <span class="brand-dot" aria-hidden="true"></span>
-        PMRv · 4 em 1
+        PMRv Operacional
       </span>
       <span class="brand-title">Padronização e Otimização</span>
     </div>
@@ -43,10 +43,18 @@
   ============================================================ -->
   <section id="screen-home" class="screen active" aria-label="Menu principal">
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
           <h2 class="card-title">O que você precisa?</h2>
           <p class="card-sub">Escolha o módulo para começar.</p>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-gps-minimal" data-click="gps_obterLocalizacao()" title="Onde estou agora?">
+            📍 Onde estou?
+          </button>
+          <button class="btn-gps-minimal" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #10b981;" data-click="gps_simularLocalizacao()" title="Simular Localização (Teste)">
+            🧪 Simular
+          </button>
         </div>
       </div>
 
@@ -58,16 +66,23 @@
           <span class="menu-arrow">›</span>
         </button>
 
+        <button class="menu-card" data-color="red" data-click="go('patrulhamento')">
+          <div class="menu-icon"><span style="font-size:32px;">🚔</span></div>
+          <div class="menu-title">Patrulhamento de Trânsito SC</div>
+          <div class="menu-desc">Registro rápido de placas e infrações</div>
+          <span class="menu-arrow">›</span>
+        </button>
+
         <button class="menu-card" data-color="amber" data-click="go('infracoes')">
-          <div class="menu-icon"><img src="infrações.png" alt="Consulta de Infrações" class="menu-icon-img menu-icon-img-infra" /></div>
-          <div class="menu-title">Consulta de Infrações</div>
+          <div class="menu-icon"><img src="infrações.png" alt="Guia de Enquadramentos" class="menu-icon-img menu-icon-img-infra" /></div>
+          <div class="menu-title">Guia de Enquadramentos</div>
           <div class="menu-desc">Pesquisar diretamente na base local do aplicativo</div>
           <span class="menu-arrow">›</span>
         </button>
 
         <button class="menu-card" data-color="green" data-click="go('envolvidos')">
-          <div class="menu-icon"><img src="img/extracted_3.png" alt="Relato de Envolvidos" class="menu-icon-img menu-icon-img-env" /></div>
-          <div class="menu-title">Relato de Envolvidos</div>
+          <div class="menu-icon"><img src="img/extracted_3.png" alt="Prévia de Registro: Condutores/Vítimas" class="menu-icon-img menu-icon-img-env" /></div>
+          <div class="menu-title">Prévia de Registro: Condutores/Vítimas</div>
           <div class="menu-desc">Registro de sinistro + fotos</div>
           <span class="menu-arrow">›</span>
         </button>
@@ -99,6 +114,187 @@
           <div class="menu-desc">Manual de uso de cada opção</div>
           <span class="menu-arrow">›</span>
         </button>
+
+        <button class="menu-card" data-color="purple" data-click="go('docs')">
+          <div class="menu-icon"><span style="font-size: 32px;">📚</span></div>
+          <div class="menu-title">Documentos Trânsito</div>
+          <div class="menu-desc">MBFT, CTB, Resoluções e Guias</div>
+          <span class="menu-arrow">›</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TACÓGRAFO (INMETRO)
+  ============================================================ -->
+  <section id="screen-tacografo" class="screen">
+    <div class="back-row">
+      <button class="btn" data-click="go('home')">← Voltar</button>
+      <button class="btn btn-danger" data-click="go('ended')">Sair</button>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">⏱️ Consulta de Cronotacógrafo</h2>
+          <p class="card-sub">Verificação oficial junto à base do Inmetro</p>
+        </div>
+      </div>
+
+      <div class="docs-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px;">
+        
+        <!-- Ferramentas Oficiais -->
+        <div class="doc-group">
+          <h3 class="field-label-orange">Ferramentas de Consulta</h3>
+          <div class="doc-links-stack">
+            <a href="https://play.google.com/store/apps/details?id=br.gov.inmetro.cronotacografo" target="_blank" class="doc-link-item">
+              <span class="doc-icon">📱</span>
+              <div class="doc-info">
+                <strong>App CertCrono</strong>
+                <span>Aplicativo Oficial Inmetro (Android)</span>
+              </div>
+            </a>
+            <a href="https://cronotacografo.rbmlq.gov.br/consultas/certificados" target="_blank" class="doc-link-item">
+              <span class="doc-icon">🌐</span>
+              <div class="doc-info">
+                <strong>Consulta Web (Placa)</strong>
+                <span>Verificar Certificado por Placa/Chassi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- QR Code / Validação -->
+        <div class="doc-group">
+          <h3 class="field-label-orange">Validação de Certificado</h3>
+          <div class="doc-link-item" style="background: rgba(245, 130, 32, 0.05); border-color: rgba(245, 130, 32, 0.2);">
+            <div style="text-align:center; width: 100%; padding: 10px;">
+              <div style="font-size: 40px; margin-bottom: 10px;">🔳</div>
+              <strong style="display:block; color: #f58220; margin-bottom: 5px;">QR Code de Verificação</strong>
+              <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4;">
+                Utilize o App CertCrono para ler o QR Code presente no certificado do veículo.
+                <br><br>
+                <span style="color: #fff; font-weight: bold;">⚠️ Atenção:</span> A verificação do Inmetro tem validade de <span style="color: #22c55e;">2 ANOS</span>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DOCUMENTOS DE TRÂNSITO
+  ============================================================ -->
+  <section id="screen-docs" class="screen">
+    <div class="back-row">
+      <button class="btn" data-click="go('home')">← Voltar</button>
+      <button class="btn btn-danger" data-click="go('ended')">Sair</button>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">📚 Documentos de Trânsito</h2>
+          <p class="card-sub">Consulta rápida de manuais e legislação</p>
+        </div>
+      </div>
+
+      <div class="docs-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px;">
+        
+        <!-- Legislação -->
+        <div class="doc-group">
+          <h3 class="field-label-orange">Legislação e Manuais</h3>
+          <div class="doc-links-stack">
+            <a href="https://www.planalto.gov.br/ccivil_03/leis/l9503compilado.htm" target="_blank" class="doc-link-item">
+              <span class="doc-icon">⚖️</span>
+              <div class="doc-info">
+                <strong>CTB Atualizado</strong>
+                <span>Código de Trânsito Brasileiro (Planalto)</span>
+              </div>
+            </a>
+            <a href="https://www.gov.br/transportes/pt-br/assuntos/transito/senatran/manual-brasileiro-de-fiscalizacao-de-transito" target="_blank" class="doc-link-item">
+              <span class="doc-icon">📘</span>
+              <div class="doc-info">
+                <strong>MBFT Digital</strong>
+                <span>Manual Brasileiro de Fiscalização (SENATRAN)</span>
+              </div>
+            </a>
+            <a href="https://www.in.gov.br/en/web/dou/-/resolucao-contran-n-996-de-15-de-junho-de-2023-490515153" target="_blank" class="doc-link-item">
+              <span class="doc-icon">🛵</span>
+              <div class="doc-info">
+                <strong>Lei de Ciclomotores</strong>
+                <span>Resolução 996/23 - Regras e Definições</span>
+              </div>
+            </a>
+            <a href="https://www.gov.br/transportes/pt-br/assuntos/transito/senatran/perguntas-frequentes-resolucao-contran-no-996-2023" target="_blank" class="doc-link-item">
+              <span class="doc-icon">💡</span>
+              <div class="doc-info">
+                <strong>Guia Prático: Ciclomotores</strong>
+                <span>Perguntas Frequentes - Senatran</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Fiscalização Técnica -->
+        <div class="doc-group">
+          <h3 class="field-label-orange">Fiscalização Técnica (Inmetro)</h3>
+          <div class="doc-links-stack">
+            <a href="https://play.google.com/store/apps/details?id=br.gov.inmetro.cronotacografo" target="_blank" class="doc-link-item">
+              <span class="doc-icon">📱</span>
+              <div class="doc-info">
+                <strong>App CertCrono</strong>
+                <span>Consulta de Certificado (Inmetro)</span>
+              </div>
+            </a>
+            <a href="https://cronotacografo.rbmlq.gov.br/consultas/certificados" target="_blank" class="doc-link-item">
+              <span class="doc-icon">🌐</span>
+              <div class="doc-info">
+                <strong>Portal Tacógrafo</strong>
+                <span>Consulta Web por Placa ou Chassi</span>
+              </div>
+            </a>
+            <div class="doc-link-item" style="background: rgba(245, 130, 32, 0.05); border-color: rgba(245, 130, 32, 0.2); cursor: default;">
+              <span class="doc-icon">🔳</span>
+              <div class="doc-info">
+                <strong>QR Code de Verificação</strong>
+                <span>Validade Inmetro: 2 ANOS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guias Rápidos -->
+        <div class="doc-group">
+          <h3 class="field-label-orange">Guias de Orientação</h3>
+          <div class="doc-links-stack">
+            <div class="doc-link-item" data-click="alert('Em breve: Tabela resumida de infrações e valores.')">
+              <span class="doc-icon">💰</span>
+              <div class="doc-info">
+                <strong>Tabela de Valores</strong>
+                <span>Multas, Pontuação e Prazos</span>
+              </div>
+            </div>
+            <div class="doc-link-item" data-click="alert('Em breve: Lista de verificação para veículos de carga e passageiros.')">
+              <span class="doc-icon">🚚</span>
+              <div class="doc-info">
+                <strong>Checklist Operacional</strong>
+                <span>Equipamentos Obrigatórios</span>
+              </div>
+            </div>
+            <div class="doc-link-item" data-click="alert('Em breve: Regras para CNH estrangeira e veículos Mercosul.')">
+              <span class="doc-icon">🌎</span>
+              <div class="doc-info">
+                <strong>Condutores Estrangeiros</strong>
+                <span>Normas para o Mercosul</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -111,148 +307,133 @@
       <button class="btn" data-click="go('home')">← Voltar</button>
       <button class="btn btn-danger" data-click="go('ended')">Sair</button>
     </div>
-    <div class="card">
+    
+    <div class="card space-y-6">
       <div class="card-header">
         <div>
           <h2 class="card-title">🚔 Iniciando o Serviço</h2>
-          <p class="card-sub">Gerar texto de início de serviço para envio</p>
+          <p class="card-sub">Configure a guarnição e gere o texto de início</p>
         </div>
       </div>
 
-      <div class="form-grid">
-        <!-- Mesa -->
-        <div class="form-field">
-          <button id="ass_mesa_btn" type="button" class="vtr-btn" style="width:100%;font-size:15px;padding:12px;" data-click="ass_toggleMesa()">🪑 Recepção do P19</button>
-        </div>
-
-        <!-- Builder: Viatura + Policiais -->
-        <div class="form-field" id="ass_builder_wrap">
-          <div id="ass_build_vtr_section">
-            <label class="field-label">Adicionar Viatura</label>
-            <div class="vtr-grid" id="ass_build_vtr_grid">
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'0005')">PM-0005</button>
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'0070')">PM-0070</button>
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'5312')">PM-5312</button>
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'6997')">PM-6997</button>
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'5484')">PM-5484</button>
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'5592')">PM-5592</button>
-              <button type="button" class="vtr-btn" data-click="ass_build_selecionarVtr(this,'5599')">PM-5599</button>
-              <button type="button" class="vtr-btn vtr-manual-btn" id="ass_build_vtr_manual_btn" data-click="ass_build_toggleVtrManual(this)">✏️ Manual</button>
-            </div>
-            <div id="ass_build_vtr_manual_wrap" class="hidden mt-8">
-              <div style="display:flex;gap:6px;align-items:center;">
-                <div class="prefix-input" style="flex:1;">
-                  <span>PM-</span>
-                  <input type="text" id="ass_build_vtr_input" placeholder="0000" maxlength="4" inputmode="numeric">
-                </div>
-              </div>
-            </div>
-            <div id="ass_build_vtr_label" style="display:none;margin-top:8px;padding:6px 12px;border-radius:8px;background:rgba(59,130,246,.12);color:#3b82f6;font-size:13px;font-weight:700;"></div>
-            <div id="ass_build_tipo_section" style="display:none;margin-top:10px;">
-              <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--label);margin-bottom:6px;">Escala</div>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-                <button type="button" class="vtr-btn ass-tipo-btn" data-click="ass_build_selecionarTipo(this,'Ordinária')">Ordinária</button>
-                <button type="button" class="vtr-btn ass-tipo-btn" data-click="ass_build_selecionarTipo(this,'Apoio')">Apoio</button>
-                <button type="button" class="vtr-btn ass-tipo-btn" data-click="ass_build_selecionarTipo(this,'Ponte')">Ponte</button>
-                <button type="button" class="vtr-btn ass-tipo-btn" data-click="ass_build_selecionarTipo(this,'Evento')">Evento</button>
-                <button type="button" class="vtr-btn ass-tipo-btn" data-click="ass_build_selecionarTipo(this,'Futebol')">Futebol</button>
-                <button type="button" class="vtr-btn ass-tipo-btn" data-click="ass_build_selecionarTipo(this,'__manual__')">✏️ Manual</button>
-              </div>
-              <div id="ass_build_tipo_manual_wrap" class="hidden" style="margin-top:6px;">
-                <input type="text" id="ass_build_tipo_input" placeholder="Tipo de escala..." style="width:100%;" data-input="ass_build_atualizarLabel()">
-              </div>
-            </div>
-            <div style="height:1px;background:var(--border);margin:14px 0;"></div>
-          </div>
-          <label class="field-label" id="ass_build_pol_label">Policiais desta Viatura</label>
-          <div id="ass_build_grupos_grid" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px;">
-            <button type="button" class="vtr-btn" data-click="ass_build_carregarGrupo(this,'efetivo')">Efetivo</button>
-          </div>
-          <div id="ass_build_nomes_grid" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-          <div id="ass_build_manual_pol_wrap" class="hidden">
-            <div style="display:flex;gap:6px;align-items:center;margin-top:4px;">
-              <select id="ass_build_grad_manual" style="flex:0 0 130px;">
-                <option value="Sd PM">Soldado</option>
-                <option value="Cb PM">Cabo</option>
-                <option value="3º Sgt PM">3º Sgt</option>
-                <option value="2º Sgt PM">2º Sgt</option>
-                <option value="1º Sgt PM">1º Sgt</option>
-                <option value="Sub-Ten PM">Sub-Ten</option>
-              </select>
-              <input type="text" id="ass_build_nome_manual" placeholder="Nome do policial" style="flex:1;" data-keydown-enter="ass_build_adicionarManual()">
-              <button type="button" class="btn btn-sm btn-success" data-click="ass_build_adicionarManual()">+ OK</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm" style="margin-top:6px;width:100%;" data-click="ass_build_toggleManualPol()">✏️ Adicionar Manualmente</button>
-          <div id="ass_build_pol_chips_wrap" style="display:none;margin-top:8px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--label);margin-bottom:4px;">Selecionados:</div>
-            <div id="ass_build_pol_chips" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
-          </div>
-          <div style="height:1px;background:var(--border);margin:14px 0;"></div>
-          <label class="field-label" id="ass_build_hor_label">Horário desta Viatura</label>
-          <select id="ass_build_horario" style="width:100%;">
-            <option value="06h às 18h">06h às 18h (Diurno)</option>
-            <option value="07h às 19h">07h às 19h (Diurno)</option>
-            <option value="19h às 07h">19h às 07h (Noturno)</option>
-            <option value="13h às 01h">13h às 01h</option>
-            <option value="07h às 07h">07h às 07h (24h)</option>
-          </select>
-          <button type="button" class="btn btn-primary btn-full" id="ass_build_confirmar_btn" style="margin-top:14px;" data-click="ass_adicionarLote()">+ Confirmar Viatura</button>
-        </div>
-
-        <!-- Serviço montado (lista de lotes) -->
-        <div class="form-field" id="ass_lotes_wrap" style="display:none;">
-          <label class="field-label">Serviço Montado</label>
-          <div id="ass_lotes_lista"></div>
-        </div>
-
-        <!-- Turno -->
-        <div class="form-row form-row-2">
-          <div class="form-field">
-            <label class="field-label">Turno / Horário</label>
-            <select id="ass_horario" data-change="ass_toggleManual()">
-              <option value="06h às 18h">06h às 18h (Diurno)</option>
-              <option value="07h às 19h">07h às 19h (Diurno)</option>
-              <option value="19h às 07h">19h às 07h (Noturno)</option>
-              <option value="13h às 01h">13h às 01h</option>
-              <option value="07h às 07h">07h às 07h (24h)</option>
-              <option value="MANUAL">Inserir manualmente...</option>
-            </select>
-            <input type="text" id="ass_horarioManual" class="hidden mt-8" placeholder="Ex: 08h às 14h">
-          </div>
-          <div class="form-field">
-            <label class="field-label">Localização</label>
-            <select id="ass_local">
-              <option>P19</option>
-              <option>Ponte</option>
-              <option>SC-400</option>
-              <option>SC-402</option>
-              <option>SC-403</option>
-              <option>Viatura de apoio no P19</option>
-              <option>Setor 3 – Área Central / Pontes</option>
-              <option>Apoio / Futebol</option>
-              <option>Pontes / Futebol</option>
-            </select>
-            <input type="text" id="ass_localManual" class="mt-8" placeholder="Local manual (deixe vazio para usar acima)">
-          </div>
-        </div>
-
-        <button class="btn btn-primary btn-full btn-lg" data-click="ass_gerar()">⚡ Gerar Texto</button>
+      <!-- Toggle Mesa / Viatura -->
+      <div class="flex gap-2" style="display: flex; gap: 8px;">
+        <button id="btn-mode-mesa" class="btn flex-1" style="flex: 1;" data-click="ass_setMode(true)">📳 Mesa / P19</button>
+        <button id="btn-mode-vtr" class="btn btn-primary flex-1" style="flex: 1;" data-click="ass_setMode(false)">🚔 Viatura</button>
       </div>
 
-      <div class="result-box" id="ass_result">
-        <p class="result-label">Texto gerado</p>
-        <div class="result-text" id="ass_resultado"></div>
-        <div class="result-actions">
-          <button class="btn btn-success" data-click="copiar('ass_resultado', this)">📋 Copiar</button>
-          <button class="btn btn-whats"   data-click="whatsapp('ass_resultado')">📲 WhatsApp</button>
+      <!-- Seção Viatura -->
+      <div id="ass_vtr_selection" class="space-y-3">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h3 class="field-label-orange">Selecione a Viatura</h3>
         </div>
+        <div class="grid grid-cols-4 gap-2" id="ass_vtr_grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+          <button class="vtr-btn" data-click="ass_selectVtr('0005')">0005</button>
+          <button class="vtr-btn" data-click="ass_selectVtr('0070')">0070</button>
+          <button class="vtr-btn" data-click="ass_selectVtr('5312')">5312</button>
+          <button class="vtr-btn" data-click="ass_selectVtr('6997')">6997</button>
+          <button class="vtr-btn" data-click="ass_selectVtr('5484')">5484</button>
+          <button class="vtr-btn" data-click="ass_selectVtr('5592')">5592</button>
+          <button class="vtr-btn" data-click="ass_selectVtr('5599')">5599</button>
+          <button class="vtr-btn vtr-manual-btn" data-click="ass_toggleVtrManual()">✏️ Outra</button>
+        </div>
+        <div id="ass_vtr_manual_wrap" class="hidden mt-8">
+           <div class="prefix-input">
+              <span>PM-</span>
+              <input type="text" id="ass_vtr_input_manual" placeholder="0000" maxlength="4" inputmode="numeric">
+           </div>
+        </div>
+
+        <!-- Tipo de Escala (Aparece após selecionar VTR) -->
+        <div id="ass_escala_wrap" class="space-y-3 mt-12 hidden">
+          <label class="field-label">Tipo de Escala</label>
+          <div class="grid grid-cols-3 gap-2" id="ass_escala_grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+            <button class="vtr-btn" data-click="ass_selectEscala('Ordinária')">Ordinária</button>
+            <button class="vtr-btn" data-click="ass_selectEscala('Apoio')">Apoio</button>
+            <button class="vtr-btn" data-click="ass_selectEscala('Pontes')">Pontes</button>
+            <button class="vtr-btn" data-click="ass_selectEscala('Futebol')">Futebol</button>
+            <button class="vtr-btn" data-click="ass_selectEscala('Maratona')">Maratona</button>
+            <button class="vtr-btn vtr-manual-btn" data-click="ass_toggleEscalaManual()">✏️ Evento</button>
+          </div>
+          <div id="ass_escala_manual_wrap" class="hidden mt-8">
+            <input type="text" id="ass_escala_input_manual" placeholder="Descreva o evento..." style="width:100%;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Seleção de Policiais -->
+      <div class="space-y-3">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h3 class="field-label-orange">Selecione os Policiais</h3>
+        </div>
+        <div id="ass_pol_grid" class="pol-grid-container">
+          <!-- Chips gerados via JS -->
+        </div>
+        
+        <!-- Adição Manual de Policial -->
+        <div id="ass_manual_pol_wrap" class="hidden mt-8">
+          <div style="display:flex;gap:6px;align-items:center;">
+            <select id="ass_grad_manual" style="flex:0 0 100px; padding: 8px; border-radius: 8px;">
+              <option value="Sd PM">Sd PM</option>
+              <option value="Cb PM">Cb PM</option>
+              <option value="3º Sgt PM">3º Sgt</option>
+              <option value="2º Sgt PM">2º Sgt</option>
+              <option value="1º Sgt PM">1º Sgt</option>
+            </select>
+            <input type="text" id="ass_nome_manual" placeholder="Nome" style="flex:1;">
+            <button class="btn btn-success" data-click="ass_addPolManual()">+ OK</button>
+          </div>
+        </div>
+        <button class="btn btn-sm" style="width:100%; margin-top: 8px;" data-click="ass_toggleManualPol()">✏️ Policial fora da lista</button>
+      </div>
+
+      <!-- Horário -->
+      <div class="form-field">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h3 class="field-label-orange">Selecione o Horário</h3>
+        </div>
+        <select id="ass_horario_select" style="width: 100%;" data-change="ass_onHorarioChange()">
+          <option value="06h às 18h">06h às 18h</option>
+          <option value="07h às 19h" selected>07h às 19h</option>
+          <option value="19h às 07h">19h às 07h</option>
+          <option value="07h às 07h">07h às 07h (24h)</option>
+          <option value="__manual__">✏️ Inserir manualmente...</option>
+        </select>
+        <div id="ass_horario_manual_wrap" class="hidden mt-8">
+           <input type="text" id="ass_horario_input_manual" placeholder="Ex: 08h às 14h" style="width:100%;">
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button class="btn btn-danger flex-1" data-click="ass_resetCurrent()">Limpar Seleção</button>
+        <button class="btn btn-success btn-full flex-2" style="flex: 2;" id="ass_confirm_btn" data-click="ass_addLote()">
+          ➕ Adicionar ao Relatório
+        </button>
+      </div>
+    </div>
+
+    <!-- Serviço Montado -->
+    <div id="ass_lotes_card" class="card mt-12 hidden">
+      <div class="card-header">
+        <h3 class="field-label-orange">Serviço Montado</h3>
+        <button class="btn btn-sm btn-danger" data-click="ass_clearAll()">🗑️ Limpar Tudo</button>
+      </div>
+      <div id="ass_lotes_container" class="space-y-2">
+        <!-- Lotes aparecem aqui -->
+      </div>
+      
+      <div class="pt-4" style="display: flex; gap: 8px; margin-top: 16px;">
+        <button class="btn btn-primary flex-1" style="flex:1" data-click="ass_copyText()">📋 Copiar</button>
+        <button class="btn btn-whats flex-1" style="flex:1" data-click="ass_shareWhats()">📲 WhatsApp</button>
       </div>
     </div>
   </section>
 
   <!-- ============================================================
-       ENVOLVIDOS
+       PREVIA DE REGISTRO
   ============================================================ -->
   <section id="screen-envolvidos" class="screen">
     <div class="back-row">
@@ -262,8 +443,8 @@
     <div class="card">
       <div class="card-header">
         <div>
-          <h2 class="card-title">📋 Registro de Sinistro</h2>
-          <p class="card-sub">Adicione todos os envolvidos e testemunhas</p>
+          <h2 class="card-title">📋 Prévia de Registro: Condutores/Vítimas</h2>
+          <p class="card-sub">Adicione todos os envolvidos e testemunhas com detalhes</p>
         </div>
       </div>
 
@@ -283,6 +464,98 @@
   </section>
 
   <!-- ============================================================
+       PATRULHAMENTO DE TRÂNSITO SC
+  ============================================================ -->
+  <section id="screen-patrulhamento" class="screen">
+    <div class="back-row">
+      <button class="btn" data-click="go('home')">← Voltar</button>
+      <button class="btn btn-danger" data-click="go('ended')">Sair</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">🚔 Patrulhamento de Trânsito SC</h2>
+          <p class="card-sub">Registro rápido de veículos e infrações</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- Placa -->
+        <div class="form-field">
+          <label class="field-label">Placa do Veículo</label>
+          <input type="text" id="pat_placa" placeholder="ABC1234 ou ABC1D23" maxlength="8" style="text-transform: uppercase; font-weight: bold; font-size: 18px; text-align: center; letter-spacing: 2px;" data-input="pat_formatarPlaca(this)">
+        </div>
+
+        <!-- Localização GPS -->
+        <div class="form-field">
+          <label class="field-label">Localização (Rodovia/KM)</label>
+          <div style="display:flex; gap: 8px;">
+            <input type="text" id="pat_local" placeholder="Clique no GPS..." readonly style="flex:1;">
+            <button class="btn btn-primary" style="padding: 0 12px;" data-click="pat_obterGPS()">📍 GPS</button>
+          </div>
+        </div>
+
+        <!-- Infrações Rápidas -->
+        <div class="form-field">
+          <label class="field-label">Tipo de Infração</label>
+          <select id="pat_infracao_select" data-change="pat_onInfracaoChange()">
+            <option value="">-- Selecione a Infração --</option>
+            <option value="Cinto (Condutor/Passag.)|518-51 / 518-52|Grave|Art. 167">Cinto (Condutor/Passag.)</option>
+            <option value="Equipam. em Desacordo|663-71|Grave|Art. 230, X">Equipam. em Desacordo</option>
+            <option value="Desobedecer Agente|581-96|Grave|Art. 195">Desobedecer Agente</option>
+            <option value="Não Licenciado/Registrado|659-92|Gravíssima|Art. 230, V">Não Licenciado/Registrado</option>
+            <option value="Celular (Fone/Viva-voz)|736-62|Média|Art. 252, VI">Celular (Fone/Viva-voz)</option>
+            <option value="Celular (Segurar/Teclar)|763-31 / 763-32|Gravíssima|Art. 252, P.U.">Celular (Segurar/Teclar)</option>
+            <option value="Ultrapassar Linha Contínua|596-70|Gravíssima (5x)|Art. 203, V">Ultrapassar Linha Contínua</option>
+            <option value="Estacionar Acostamento|550-90|Leve|Art. 181, VII">Estacionar Acostamento</option>
+            <option value="Estac. Jardim Público|545-23|Grave|Art. 181, VIII">Estac. Jardim Público</option>
+            <option value="Restrição Peso/Dimensão|682-32|Grave|Art. 231, IV">Restrição Peso/Dimensão</option>
+            <option value="Lanterna/Luz Placa Queimada|667-00|Média|Art. 230, XXII">Lanterna/Luz Placa Queimada</option>
+            <option value="Placa Ilegível/Sem Visib.|658-00|Gravíssima|Art. 230, VI">Placa Ilegível/Sem Visib.</option>
+            <option value="MANUAL">✏️ Digitar Manualmente...</option>
+          </select>
+        </div>
+
+        <!-- Campo Manual (Oculto) -->
+        <div id="pat_box_manual" class="form-field hidden">
+          <label class="field-label">Descrição Manual da Infração</label>
+          <input type="text" id="pat_infracao_manual" placeholder="Ex: Dirigir com apenas uma mão">
+        </div>
+
+        <button class="btn btn-success btn-full" style="margin-top: 10px;" data-click="pat_salvarVeiculo()">💾 Salvar Veículo</button>
+      </div>
+    </div>
+
+    <!-- Lista de Veículos Salvos -->
+    <div id="pat_lista_card" class="card mt-12 hidden">
+      <div class="card-header">
+        <h3 class="field-label-orange">Veículos Registrados</h3>
+        <button class="btn btn-sm btn-danger" data-click="pat_limparTudo()">🗑️ Limpar Lista</button>
+      </div>
+      <div id="pat_lista_container" class="space-y-2">
+        <!-- Itens salvos aparecem aqui -->
+      </div>
+      
+      <div class="pt-4" style="display: flex; gap: 8px; margin-top: 16px;">
+        <button class="btn btn-primary flex-1" data-click="pat_gerarRelatorio()">🔄 Gerar Relatório</button>
+      </div>
+    </div>
+
+    <!-- Resultado do Relatório -->
+    <div id="pat_result_area" class="card mt-12 hidden">
+      <div class="card-header">
+        <h3 class="field-label-orange">Relatório Consolidado</h3>
+      </div>
+      <pre id="pat_result_text" style="white-space: pre-wrap; font-size: 12px; line-height: 1.5; background: var(--surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border);"></pre>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;">
+        <button class="btn btn-success" data-click="pat_whatsapp()">📲 WhatsApp</button>
+        <button class="btn" data-click="pat_downloadTXT()">💾 Download TXT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
        PMRv
   ============================================================ -->
   <section id="screen-pmrv" class="screen">
@@ -297,6 +570,13 @@
       </div>
 
       <div class="form-grid">
+        <!-- GPS Localizador -->
+        <div class="form-field" style="grid-column: span 3; margin-bottom: 12px;">
+          <button id="btn-gps-localizar" class="btn btn-primary btn-full" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; font-weight: bold;" data-click="gps_obterLocalizacao()">
+            <span style="font-size: 20px;">📍</span> Onde estou no GPS agora?
+          </button>
+        </div>
+
         <!-- Linha 1: SADE + VTR + Rodovia -->
         <div class="form-row form-row-3">
           <div class="form-field" style="grid-column: span 1;">
@@ -941,7 +1221,7 @@
         </section>
 
         <section class="help-block">
-          <h3 class="help-title">Relato de Envolvidos</h3>
+          <h3 class="help-title">Prévia de Registro: Condutores/Vítimas</h3>
           <p class="help-text">Registra pessoas, veículos, relatos e fotos.</p>
           <ul class="help-list">
             <li>Adicione um envolvido por vez.</li>
@@ -985,7 +1265,7 @@
         </section>
 
         <section class="help-block">
-          <h3 class="help-title">Consulta de Infrações</h3>
+          <h3 class="help-title">Guia de Enquadramentos</h3>
           <p class="help-text">Permite pesquisar rapidamente na base local de infrações.</p>
           <ul class="help-list">
             <li>Use a busca geral para localizar por código, descrição, artigo ou infrator.</li>
@@ -1010,7 +1290,7 @@
           <h3 class="help-title">Fluxo Recomendado</h3>
           <ul class="help-list">
             <li>1. Iniciando o Serviço</li>
-            <li>2. Relato de Envolvidos</li>
+            <li>2. Prévia de Registro: Condutores/Vítimas</li>
             <li>3. Relato Policial</li>
             <li>4. Danos Aparentes</li>
             <li>5. Relatório Completo</li>
@@ -1033,8 +1313,11 @@
   </section>
 
   <footer class="app-footer" role="contentinfo">
-    <div class="app-footer-badge">PMRv · 4 em 1</div>
-    <div class="app-footer-text">Desenvolvido por <span class="app-footer-author">Cabo Jeferson</span></div>
+    <div class="app-footer-badge">PMRv Operacional</div>
+    <div class="app-footer-text">
+      Desenvolvido por <span class="app-footer-author">Cabo Jeferson</span>
+      <button class="btn-clear-cache" data-click="core_limparCache()" title="Limpar Cache e Atualizar">🧹 Limpar Cache</button>
+    </div>
   </footer>
 
 </div><!-- /.app -->
@@ -1095,6 +1378,8 @@
      SCRIPTS UNIFICADOS
 ============================================================ -->
   <script src="js/core.js"></script>
+  <script src="js/gps.js"></script>
+  <script src="js/patrulhamento.js"></script>
   <script src="js/assuncao.js"></script>
   <script src="js/envolvidos.js"></script>
   <script src="js/pmrv.js"></script>

@@ -1,6 +1,6 @@
 {
-  "name": "PMRv 4 em 1",
-  "short_name": "PMRv",
+  "name": "PMRv Operacional",
+  "short_name": "PMRv Operacional",
   "description": "Ferramenta unificada para registro de danos e geracao de relatorios no PMRv",
   "start_url": "./index.html",
   "scope": "./",

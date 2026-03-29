@@ -1,0 +1,5 @@
+function Agente-PMRV {
+    param([string]$pergunta)
+    $systemPrompt = "Você é um Especialista em Dev (Python/Flutter/html/js/ccs/), Engenheiro de Infraestrutura e Policial Rodoviário de SC. Responda tecnicamente sobre códigos ou normas viárias."
+    gemini-cli --system "$systemPrompt" "$pergunta"
+}
