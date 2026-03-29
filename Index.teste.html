@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teste Patrulhamento · PMRv</title>
+  <link rel="stylesheet" href="css/style.css"> <style>
+    /* Estilos rápidos para o teste caso o CSS externo não carregue */
+    .screen { display: none; padding: 20px; font-family: sans-serif; }
+    .active { display: block; }
+    .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+    .btn { padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .result-box { background: #f8f9fa; border: 1px dashed #ccc; padding: 15px; border-radius: 8px; margin-top: 15px; }
+    .rodovia-badge { color: #0056b3; font-size: 1.4em; font-weight: 800; display: block; margin-bottom: 5px; }
+    .km-badge { font-size: 1.8em; font-weight: 900; color: #333; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <section id="screen-home" class="screen active">
+    <h2>Menu de Teste</h2>
+    <button class="btn btn-primary" onclick="showScreen('screen-patrulhamento')">
+      📍 Iniciar Patrulhamento Rápido
+    </button>
+  </section>
+
+  <section id="screen-patrulhamento" class="screen">
+    <button class="btn" onclick="showScreen('screen-home')">← Voltar</button>
+    
+    <div class="card">
+      <h3>📍 Patrulhamento Rápido</h3>
+      <p>Clique no botão para identificar a rodovia e o KM atual.</p>
+
+      <button class="btn btn-primary" onclick="obterLocalizacaoAtual()">
+        🔍 Onde estou agora?
+      </button>
+
+      <div id="pat_resultado_area" class="result-box" style="display:none;">
+        <div id="pat_resultado_texto"></div>
+        <button class="btn btn-success" style="margin-top:10px;" onclick="copiarLocalizacao()">📋 Copiar Dados</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// 1. Simulação do sistema de navegação que você já usa (go/showScreen)
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// 2. Base de Coordenadas KM 0 (Pontos de referência para o Posto 19)
+const rodoviasSC = {
+    "SC-401": { lat: -27.4611, lon: -48.5028 }, // Início próximo ao Centro/Itacorubi
+    "SC-405": { lat: -27.6441, lon: -48.5135 }, // Rio Tavares
+    "SC-406": { lat: -27.5755, lon: -48.4355 }, // Barra da Lagoa
+    "SC-281": { lat: -27.6044, lon: -48.6558 }, // São José
+    "SC-407": { lat: -27.4950, lon: -48.6580 }  // Biguaçu
+};
+
+// 3. Função de Cálculo de Distância (Haversine)
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return (R * c).toFixed(3);
+}
+
+// 4. Lógica Principal do GPS
+function obterLocalizacaoAtual() {
+    const display = document.getElementById('pat_resultado_texto');
+    const area = document.getElementById('pat_resultado_area');
+    
+    display.innerHTML = "🛰️ Obtendo sinal de satélite...";
+    area.style.display = 'block';
+
+    if (!navigator.geolocation) {
+        display.innerHTML = "❌ GPS não disponível neste aparelho.";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        let menorDistancia = Infinity;
+        let rodoviaDetectada = "Rodovia não mapeada";
+        let kmFinal = "0.000";
+
+        // Compara com as rodovias solicitadas
+        for (const [nome, coord] of Object.entries(rodoviasSC)) {
+            const dist = calcularDistancia(latitude, longitude, coord.lat, coord.lon);
+            if (parseFloat(dist) < menorDistancia) {
+                menorDistancia = parseFloat(dist);
+                rodoviaDetectada = nome;
+                kmFinal = dist;
+            }
+        }
+
+        display.innerHTML = `
+            <span class="rodovia-badge">🛣️ ${rodoviaDetectada}</span>
+            <span class="km-badge">KM ${kmFinal}</span>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <p style="font-size:0.8em; color:#666;">
+                Precisão: +/- ${accuracy.toFixed(1)} metros<br>
+                Lat: ${latitude.toFixed(5)} | Lon: ${longitude.toFixed(5)}
+            </p>
+        `;
+    }, (err) => {
+        display.innerHTML = "❌ Erro: Por favor, ative o GPS.";
+    }, { enableHighAccuracy: true });
+}
+
+function copiarLocalizacao() {
+    const texto = document.getElementById('pat_resultado_texto').innerText;
+    navigator.clipboard.writeText(texto);
+    alert("Localização copiada para a área de transferência!");
+}
+</script>
+
+</body>
+</html>
