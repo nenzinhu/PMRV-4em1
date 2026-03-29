@@ -99,7 +99,7 @@
       categoryCount: document.getElementById('infra_categoryCount'),
       status: document.getElementById('infra_status'),
       summary: document.getElementById('infra_summary'),
-      tableBody: document.getElementById('infra_tableBody'),
+      elements.tableBody: document.getElementById('infra_tableBody'),
       emptyState: document.getElementById('infra_emptyState')
     };
 

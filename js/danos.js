@@ -199,7 +199,7 @@ function danRenderDiagramaMulti(idx) {
     const cor  = dano ? DAN_DMG_COR[dano] : '#F58220';
     const cx   = (p.px / 100) * vbW;
     const cy   = (p.py / 100) * vbH;
-    const r    = Math.min(vbW, vbH) * 0.038;
+    const r = Math.min(vbW, vbH) * 0.05;
     const rRing= r * 1.45;
     const fSize= r * 0.75;
     hs += `
@@ -561,7 +561,7 @@ function danRenderDiagrama() {
   const area = document.getElementById('dan-diagram-area');
 
   const { vbW, vbH, imgBox, mobileOverrides } = metrics;
-  const r     = Math.min(vbW, vbH) * 0.038;
+  const r = Math.min(vbW, vbH) * 0.05;
   const rRing = r * 1.45;
   const fSize = r * 0.75;
 
@@ -576,12 +576,13 @@ function danRenderDiagrama() {
     const coords = danStoredToSvgCoords(ref.px, ref.py, metrics);
     const cx   = coords.x;
     const cy   = coords.y;
+    const hasDamageClass = dano ? ' has-damage' : '';
 
     hs += `
-      <g style="cursor:pointer;transform-origin:${cx}px ${cy}px" data-click="danAbrirModal('${p.id}')">
+      <g class="${hasDamageClass}" style="cursor:pointer;transform-origin:${cx}px ${cy}px" data-click="danAbrirModal('${p.id}')">
         <title>${p.label}</title>
         <circle cx="${cx}" cy="${cy}" r="${rRing}" fill="none" stroke="${cor}" stroke-width="1.5" stroke-dasharray="4 2" opacity="${dano?'1':'0.5'}"/>
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dano ? cor : 'rgba(10,20,60,0.82)'}" stroke="${cor}" stroke-width="2" data-part-label="${p.label}" data-zoom-src="${zoomSrc}" data-zoom-x="${ref.px}" data-zoom-y="${ref.py}" data-zoom-scale="${danVeiculo === 'carro' ? 420 : 300}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${dano ? cor : 'rgba(10,20,60,0.82)'}" stroke="${cor}" stroke-width="2" data-part-label="${p.label}" data-zoom-src="${zoomSrc}" data-zoom-x="${ref.px}" data-zoom-y="${ref.py}" data-zoom-scale="180"/>
         <text x="${cx}" y="${cy + fSize*0.38}" text-anchor="middle" dominant-baseline="middle"
               fill="${dano?'#000':'#fff'}" font-size="${fSize}" font-weight="900"
               font-family="Barlow Condensed,sans-serif" style="pointer-events:none">${i+1}</text>
@@ -656,17 +657,10 @@ function danShowTooltip(label, event, zoomMeta) {
     clearTimeout(danTooltipHideTimer);
     danTooltipHideTimer = null;
   }
-  if (zoomMeta && zoomMeta.src) {
-    const scale = zoomMeta.scale || 240;
-    const scaleRatio = scale / 100;
-    const posX = zoomMeta.x || 50;
-    const posY = zoomMeta.y || 50;
-    const translateX = 50 - (posX * scaleRatio);
-    const translateY = 50 - (posY * scaleRatio);
-    el.innerHTML = `<div class="dan-tooltip-zoom"><img class="dan-tooltip-zoom-img" src="${danEscapeHtml(zoomMeta.src)}" alt="" style="transform:translate(${translateX}%, ${translateY}%) scale(${scaleRatio});" /></div><span class="dan-tooltip-label">${danEscapeHtml(label)}</span>`;
-  } else {
-    el.innerHTML = `<span class="dan-tooltip-label">${danEscapeHtml(label)}</span>`;
-  }
+  
+  // Renderiza apenas a etiqueta com o nome da peça, sem o círculo de zoom
+  el.innerHTML = `<span class="dan-tooltip-label">${danEscapeHtml(label)}</span>`;
+  
   el.classList.add('open');
   danMoveTooltip(event);
 }

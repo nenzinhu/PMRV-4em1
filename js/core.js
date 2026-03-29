@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function(){
 /* ---------------------------------------------------------------
    NAVEGAÇÃO
 --------------------------------------------------------------- */
-const SCREENS = ['home','assumir','envolvidos','pmrv','danos','relatorio','infracoes','help','ended'];
+const SCREENS = ['home','assumir','envolvidos','pmrv','danos','relatorio','infracoes','help','ended','docs'];
 
 function go(name) {
   SCREENS.forEach(id => {
@@ -182,5 +182,39 @@ function resolveDeclarativeToken(token, el, event) {
   }
 
   return token;
+}
+
+
+/**
+ * Limpa todos os dados de cache do navegador para o aplicativo.
+ * Remove LocalStorage, SessionStorage e forca a limpeza do Service Worker (PWA).
+ */
+function core_limparCache() {
+    if (confirm('Atenção!\n\nEsta ação limpará todos os dados salvos temporariamente no aplicativo e forçará a atualização para a versão mais recente.\n\nDeseja continuar?')) {
+        
+        // 1. Limpa o Storage do navegador
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 2. Tenta limpar os caches do Service Worker (PWA)
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                for (let name of names) caches.delete(name);
+            });
+        }
+        
+        // 3. Unregister todos os Service Workers para forçar atualização
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+
+        // 4. Feedback e Recarregamento
+        alert('Cache limpo com sucesso!\nO aplicativo será reiniciado.');
+        window.location.reload(true);
+    }
 }
 
